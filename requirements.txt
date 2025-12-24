@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlmodel
+pandas
+nba_api
+streamlit
+scikit-learn
+pytest
+requests
+httpx
+psycopg2-binary
