@@ -1,6 +1,7 @@
-from typing import Optional, List
-from sqlmodel import Field, SQLModel, Relationship
-from datetime import date
+from typing import Optional, List, Dict, Any
+from sqlmodel import Field, SQLModel, Relationship, JSON
+from datetime import date, datetime
+import uuid
 
 # Link table for Many-to-Many relationship
 class TeamRoster(SQLModel, table=True):
@@ -87,3 +88,24 @@ class DailyStandings(SQLModel, table=True):
     rank: int = 0
     
     team: FantasyTeam = Relationship(back_populates="daily_standings")
+
+# --- Supervisor / Agent Models ---
+
+class AgentTask(SQLModel, table=True):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
+    task_type: str  # e.g., "calculate_roto", "import_roster"
+    status: str = "pending" # pending, running, completed, failed
+    payload: Dict = Field(default={}, sa_type=JSON)
+    result: Dict = Field(default={}, sa_type=JSON)
+    error: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AuditLog(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    task_id: Optional[str] = Field(default=None, foreign_key="agenttask.id")
+    entity_type: str # "League", "Team"
+    entity_id: int
+    action: str # "update_roster", "calculate_standings"
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    details: Dict = Field(default={}, sa_type=JSON)

@@ -1,22 +1,19 @@
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from sqlmodel import Session, select
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 import pandas as pd
 import json
 import logging
 from datetime import date
 
-# Import the module so we can access attributes dynamically (helps with testing/patching)
 import src.core.db
 from src.core.db import get_session, create_db_and_tables
-from src.core.models import Player, PlayerStats, FantasyTeam, TeamRoster, League, DailyStandings
-from src.ingestion.nba_client import NBAClient
+from src.core.models import Player, PlayerStats, FantasyTeam, TeamRoster, League, DailyStandings, AgentTask
 from src.core.stats import aggregate_player_stats, calculate_z_scores
 from src.core.analyzer import TradeAnalyzer
 from src.core.recommender import recommend_daily_lineup
-from src.core.roto import calculate_roto_standings
-from src.core.importer import RosterImporter
+from src.core.supervisor import Supervisor
 
 app = FastAPI(title="Fantasy NBA Assistant API")
 
@@ -28,7 +25,7 @@ def on_startup():
         print(f"WARNING: Database connection failed on startup: {e}")
         logging.warning(f"Database connection failed: {e}")
 
-# Models for API
+# Models
 class TradeRequest(BaseModel):
     team_a_roster: Optional[List[int]] = None
     team_b_roster: Optional[List[int]] = None
@@ -54,19 +51,58 @@ class PlayerAdd(BaseModel):
     player_id: int
 
 class RosterImportRequest(BaseModel):
-    roster_map: Dict[str, List[str]] # {"TeamName": ["Player1", "Player2"]}
+    roster_map: Dict[str, List[str]]
+
+class TaskResponse(BaseModel):
+    task_id: str
+    status: str
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Fantasy NBA Assistant"}
 
-@app.post("/ingest")
+# --- Supervisor / Agent Endpoints ---
+
+@app.post("/ingest", response_model=TaskResponse)
 def trigger_ingestion(req: IngestionRequest, background_tasks: BackgroundTasks):
-    client = NBAClient()
-    # Access engine dynamically from the module to pick up any test patches
-    background_tasks.add_task(client.sync_players, src.core.db.engine, mock=req.mock)
-    background_tasks.add_task(client.sync_recent_stats, src.core.db.engine, days=req.days, mock=req.mock)
-    return {"status": "Ingestion started in background"}
+    task = Supervisor.submit_task("ingest_data", req.model_dump())
+    background_tasks.add_task(Supervisor.run_task, task.id)
+    return {"task_id": task.id, "status": "submitted"}
+
+@app.post("/leagues/{league_id}/import_rosters", response_model=TaskResponse)
+def import_rosters(league_id: int, req: RosterImportRequest, background_tasks: BackgroundTasks):
+    payload = {"league_id": league_id, "roster_map": req.roster_map}
+    task = Supervisor.submit_task("import_roster", payload)
+    background_tasks.add_task(Supervisor.run_task, task.id)
+    return {"task_id": task.id, "status": "submitted"}
+
+@app.get("/leagues/{league_id}/standings") # Keeping return type flexible as it might be list or task
+def get_standings(league_id: int, background_tasks: BackgroundTasks, session: Session = Depends(get_session)):
+    """
+    Triggers calculation and returns current (potentially stale) standings immediately.
+    Or we could make this purely async.
+    For MVP hybrid: Trigger calc in background, return current DB rows.
+    """
+    # Trigger Update
+    task = Supervisor.submit_task("calculate_roto", {"league_id": league_id})
+    background_tasks.add_task(Supervisor.run_task, task.id)
+    
+    # Return current rows
+    stmt = select(DailyStandings).where(DailyStandings.league_id == league_id)
+    # Sort by date desc, rank asc
+    # Actually just get latest date?
+    # Simple sort for now
+    standings = session.exec(stmt).all()
+    return sorted(standings, key=lambda x: (x.date, x.rank), reverse=True)
+
+@app.get("/tasks/{task_id}", response_model=AgentTask)
+def get_task_status(task_id: str, session: Session = Depends(get_session)):
+    task = session.get(AgentTask, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+# --- Standard Read Endpoints (Direct DB Access) ---
 
 @app.get("/players")
 def get_players(session: Session = Depends(get_session)):
@@ -88,7 +124,6 @@ def get_stats(session: Session = Depends(get_session)):
     df_z['full_name'] = df_z['player_id'].map(p_map)
     return df_z.to_dict(orient='records')
 
-# --- League Management ---
 @app.post("/leagues", response_model=League)
 def create_league(league: LeagueCreate, session: Session = Depends(get_session)):
     db_league = League.model_validate(league)
@@ -101,36 +136,17 @@ def create_league(league: LeagueCreate, session: Session = Depends(get_session))
 def get_leagues(session: Session = Depends(get_session)):
     return session.exec(select(League)).all()
 
-@app.get("/leagues/{league_id}/standings", response_model=List[DailyStandings])
-def get_standings(league_id: int, session: Session = Depends(get_session)):
-    # Trigger Calculation (in a real app this might be a background job)
-    standings = calculate_roto_standings(session, league_id)
-    # Re-fetch ensuring relations if needed, or just return list
-    # Because calculate_roto_standings returns objects attached to session, simple return works
-    # However, sort by rank
-    return sorted(standings, key=lambda x: x.rank)
-
 @app.post("/leagues/{league_id}/join")
 def join_league(league_id: int, team_id: int, session: Session = Depends(get_session)):
     league = session.get(League, league_id)
     team = session.get(FantasyTeam, team_id)
     if not league or not team:
         raise HTTPException(status_code=404, detail="League or Team not found")
-        
     team.league_id = league.id
     session.add(team)
     session.commit()
     return {"message": f"Team {team.name} joined League {league.name}"}
 
-@app.post("/leagues/{league_id}/import_rosters")
-def import_rosters(league_id: int, req: RosterImportRequest, session: Session = Depends(get_session)):
-    importer = RosterImporter(session)
-    report = importer.process_import(league_id, req.roster_map)
-    if "error" in report:
-        raise HTTPException(status_code=404, detail=report["error"])
-    return report
-
-# --- Team Management ---
 @app.post("/teams", response_model=FantasyTeam)
 def create_team(team: TeamCreate, session: Session = Depends(get_session)):
     db_team = FantasyTeam.model_validate(team)
@@ -163,14 +179,11 @@ def add_player_to_team(team_id: int, player: PlayerAdd, session: Session = Depen
     team = session.get(FantasyTeam, team_id)
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    
     db_player = session.get(Player, player.player_id)
     if not db_player:
         raise HTTPException(status_code=404, detail="Player not found")
-        
     if db_player in team.players:
         return {"message": "Player already in team"}
-        
     team.players.append(db_player)
     session.add(team)
     session.commit()
@@ -192,7 +205,6 @@ def analyze_trade(req: TradeRequest, session: Session = Depends(get_session)):
         team_a = session.get(FantasyTeam, req.team_a_id)
         if team_a:
             roster_a = [p.id for p in team_a.players]
-            
     if req.team_b_id:
         team_b = session.get(FantasyTeam, req.team_b_id)
         if team_b:

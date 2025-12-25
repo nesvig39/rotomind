@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import json
+import time
 
 API_URL = "http://localhost:8000"
 
@@ -9,18 +10,39 @@ st.set_page_config(page_title="Fantasy NBA Assistant", layout="wide")
 
 st.title("🏀 Fantasy NBA Assistant (8-Cat)")
 
+def poll_task(task_id):
+    """Polls the task endpoint until completion."""
+    progress = st.progress(0)
+    status_text = st.empty()
+    
+    for i in range(20): # Max 20 attempts
+        time.sleep(1)
+        r = requests.get(f"{API_URL}/tasks/{task_id}")
+        if r.status_code == 200:
+            task = r.json()
+            status_text.text(f"Status: {task['status']}")
+            progress.progress((i+1) * 5)
+            
+            if task['status'] in ['completed', 'failed']:
+                progress.progress(100)
+                return task
+    
+    status_text.text("Timeout waiting for task.")
+    return None
+
 # Sidebar for controls
 st.sidebar.header("Controls")
 if st.sidebar.button("Run Data Ingestion"):
-    with st.spinner("Ingesting data from NBA API..."):
-        try:
-            response = requests.post(f"{API_URL}/ingest", json={"days": 15})
-            if response.status_code == 200:
-                st.sidebar.success("Ingestion started in background!")
-            else:
-                st.sidebar.error(f"Error: {response.text}")
-        except Exception as e:
-             st.sidebar.error(f"Failed to connect to API: {e}")
+    try:
+        response = requests.post(f"{API_URL}/ingest", json={"days": 15})
+        if response.status_code == 200:
+            task_data = response.json()
+            st.sidebar.success(f"Ingestion Submitted (Task: {task_data['task_id']})")
+            # Optional: Poll
+        else:
+            st.sidebar.error(f"Error: {response.text}")
+    except Exception as e:
+            st.sidebar.error(f"Failed to connect to API: {e}")
 
 # Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Dashboard", "Trade Analyzer", "Player Explorer", "My Teams", "Leagues"])
@@ -292,14 +314,22 @@ with tab5:
                 try:
                     roster_map = json.loads(import_data)
                     lid = l_opts[sel_l_import]
-                    with st.spinner("Importing..."):
+                    with st.spinner("Submitting Import Task..."):
                         r = requests.post(f"{API_URL}/leagues/{lid}/import_rosters", json={"roster_map": roster_map})
                         if r.status_code == 200:
-                            report = r.json()
-                            st.success(f"Import Complete! Created {report['teams_created']} teams, added {report['players_added']} players.")
-                            if report['players_not_found']:
-                                st.warning("The following players were not found:")
-                                st.table(pd.DataFrame(report['players_not_found']))
+                            task_info = r.json()
+                            st.success(f"Import Task Submitted (ID: {task_info['task_id']})")
+                            
+                            # Poll
+                            result = poll_task(task_info['task_id'])
+                            if result and result['status'] == 'completed':
+                                report = result['result']
+                                st.success(f"Import Complete! Created {report.get('teams_created', 0)} teams.")
+                                if report.get('players_not_found'):
+                                    st.warning("Players not found:")
+                                    st.table(pd.DataFrame(report['players_not_found']))
+                            elif result and result['status'] == 'failed':
+                                st.error(f"Task Failed: {result.get('error')}")
                         else:
                              st.error(f"Import Failed: {r.text}")
                 except json.JSONDecodeError:
@@ -332,25 +362,27 @@ with tab5:
         if sel_l:
             lid = l_opts[sel_l]
             if st.button("Calculate Standings"):
-                with st.spinner("Calculating..."):
-                    try:
-                        r = requests.get(f"{API_URL}/leagues/{lid}/standings")
-                        if r.status_code == 200:
-                            standings = r.json()
-                            if standings:
-                                df = pd.DataFrame(standings)
-                                # Show interesting cols
-                                show_cols = ['rank', 'team_id', 'total_roto_points', 
-                                             'points_pts', 'points_reb', 'points_ast', 'points_stl', 'points_blk', 
-                                             'points_tpm', 'points_fg_pct', 'points_ft_pct']
-                                st.dataframe(df[show_cols])
-                                
-                                st.write("Raw Totals")
-                                raw_cols = [c for c in df.columns if c.startswith('total_') and c != 'total_roto_points']
-                                st.dataframe(df[['team_id'] + raw_cols])
-                            else:
-                                st.info("No standings data generated. Are there teams with players in this league?")
-                    except Exception as e:
-                        st.error(f"API Error: {e}")
+                # No spinner block here, we poll manually inside
+                try:
+                    # This now returns the rows but triggers background recalc? 
+                    # Actually API get_standings logic: "Trigger Update (background) -> Return current rows".
+                    # So the user might see stale data first. 
+                    # To be better, we could add a "Recalculate" POST endpoint and a "Get" GET endpoint.
+                    # Current API impl: triggers task, returns rows.
+                    # Let's just show rows and say "Calculation started in background".
+                    r = requests.get(f"{API_URL}/leagues/{lid}/standings")
+                    if r.status_code == 200:
+                        st.info("Calculation triggered in background. Showing latest available data.")
+                        standings = r.json()
+                        if standings:
+                            df = pd.DataFrame(standings)
+                            show_cols = ['rank', 'team_id', 'total_roto_points', 
+                                         'points_pts', 'points_reb', 'points_ast', 'points_stl', 'points_blk', 
+                                         'points_tpm', 'points_fg_pct', 'points_ft_pct']
+                            st.dataframe(df[show_cols])
+                        else:
+                            st.info("No standings data yet.")
+                except Exception as e:
+                    st.error(f"API Error: {e}")
     else:
         st.info("No leagues found.")

@@ -5,22 +5,11 @@ Follow these steps to deploy the Fantasy NBA Assistant code to your GitHub repos
 ## Prerequisites
 
 1.  **GitHub Account**: Ensure you have an active account on [GitHub](https://github.com).
-2.  **Git Installed**: Ensure `git` is installed on your local machine (`git --version`).
-3.  **Local Project**: You should be in the root directory of this project (`fantasy_nba/`).
+2.  **Local Project**: You should be in the root directory of this project (`fantasy_nba/`).
 
-## Step 1: Create a Repository on GitHub
+---
 
-1.  Log in to GitHub.
-2.  Click the **+** icon in the top-right corner and select **New repository**.
-3.  **Name**: Enter a name (e.g., `fantasy-nba-assistant`).
-4.  **Visibility**: Choose Public or Private.
-5.  **Initialize**: Do **NOT** check "Add a README", ".gitignore", or "License" (we already have these locally).
-6.  Click **Create repository**.
-7.  Copy the URL provided (e.g., `https://github.com/your-username/fantasy-nba-assistant.git`).
-
-## Step 2: Prepare Local Environment
-
-Open your terminal and navigate to the project root.
+## Option 1: Using Git Command Line (Recommended)
 
 1.  **Initialize Git** (if not already done):
     ```bash
@@ -50,33 +39,42 @@ Open your terminal and navigate to the project root.
     git commit -m "Initial commit: Fantasy NBA Assistant MVP"
     ```
 
-## Step 3: Link and Push to GitHub
-
-1.  **Add Remote**:
-    Link your local folder to the GitHub repo you created in Step 1. Replace the URL with your actual repo URL.
+5.  **Link and Push to GitHub**:
+    Replace the URL below with your actual repository URL.
     ```bash
-    git remote add origin https://github.com/your-username/fantasy-nba-assistant.git
-    ```
-
-2.  **Rename Branch** (Optional but recommended):
-    Ensure your main branch is named `main`.
-    ```bash
+    git remote add origin https://github.com/nesvig39/rotomind.git
     git branch -M main
-    ```
-
-3.  **Push Code**:
-    Upload your code to GitHub.
-    ```bash
     git push -u origin main
     ```
+
+---
+
+## Option 2: Manual Upload via Web Interface
+
+If you are uncomfortable with the command line, you can upload files directly through the browser.
+
+1.  **Prepare Your Files**:
+    - Ensure your code is organized in a folder on your computer.
+    - Delete any `__pycache__` folders or `.db` files if they exist locally to avoid uploading clutter.
+
+2.  **Go to GitHub**:
+    - Navigate to your repository: [https://github.com/nesvig39/rotomind](https://github.com/nesvig39/rotomind)
+
+3.  **Upload**:
+    - Click on the **Add file** button (usually near the top right of the file list).
+    - Select **Upload files**.
+    - Drag and drop your project folders (`src`, `tests`, etc.) and files (`requirements.txt`, `README.md`, etc.) into the drop zone.
+    - **Note**: GitHub Web Upload has a limit of 100 files per upload. If you have many files, you may need to upload them in batches or use Option 1.
+
+4.  **Commit**:
+    - In the "Commit changes" box at the bottom, type a description (e.g., "Initial code upload").
+    - Click **Commit changes**.
+
+---
 
 ## Step 4: Environment Variables (Security Warning)
 
 This project uses environment variables (e.g., `DATABASE_URL` for PostgreSQL).
 
-*   **DO NOT** commit a `.env` file containing real passwords or API keys to GitHub.
+*   **DO NOT** upload a `.env` file containing real passwords or API keys to GitHub.
 *   If you deploy this application (e.g., to Heroku, Vercel, Railway), set these variables in the hosting provider's dashboard.
-
-## Verification
-
-Visit your GitHub repository URL in the browser. You should see all your source code (`src/`, `tests/`, `requirements.txt`, etc.) listed there.
