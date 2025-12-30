@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any
 from sqlmodel import Field, SQLModel, Relationship, JSON
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 import uuid
 
 # Link table for Many-to-Many relationship
@@ -98,8 +98,8 @@ class AgentTask(SQLModel, table=True):
     payload: Dict = Field(default={}, sa_type=JSON)
     result: Dict = Field(default={}, sa_type=JSON)
     error: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class AuditLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -107,5 +107,5 @@ class AuditLog(SQLModel, table=True):
     entity_type: str # "League", "Team"
     entity_id: int
     action: str # "update_roster", "calculate_standings"
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     details: Dict = Field(default={}, sa_type=JSON)

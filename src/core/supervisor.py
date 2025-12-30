@@ -1,6 +1,6 @@
 from typing import Dict, Any, Type
 from sqlmodel import Session, select
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 import logging
 
@@ -128,7 +128,7 @@ class Supervisor:
                     task.error = str(e)
                     task.result = {"traceback": traceback.format_exc()}
                 finally:
-                    task.updated_at = datetime.utcnow()
+                    task.updated_at = datetime.now(timezone.utc)
                     session.add(task)
                     session.commit()
             else:
