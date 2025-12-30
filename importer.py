@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 from sqlmodel import Session, select
-from src.core.models import League, FantasyTeam, Player
+from models import League, FantasyTeam, Player
 import difflib
 
 class RosterImporter:

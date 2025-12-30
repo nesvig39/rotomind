@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
@@ -5,25 +6,36 @@ from pydantic import BaseModel
 import pandas as pd
 import json
 import logging
-from datetime import date
+from datetime import date as date_type
 
-import src.core.db
-from src.core.db import get_session, create_db_and_tables
-from src.core.models import Player, PlayerStats, FantasyTeam, TeamRoster, League, DailyStandings, AgentTask
-from src.core.stats import aggregate_player_stats, calculate_z_scores
-from src.core.analyzer import TradeAnalyzer
-from src.core.recommender import recommend_daily_lineup
-from src.core.supervisor import Supervisor
+import db as db_module
+from db import get_session, create_db_and_tables
+from models import Player, PlayerStats, FantasyTeam, TeamRoster, League, DailyStandings, AgentTask
+from stats import aggregate_player_stats, calculate_z_scores
+from analyzer import TradeAnalyzer
+from recommender import recommend_daily_lineup
+from supervisor import Supervisor
 
-app = FastAPI(title="Fantasy NBA Assistant API")
+logger = logging.getLogger(__name__)
 
-@app.on_event("startup")
-def on_startup():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events."""
+    # Startup
     try:
         create_db_and_tables()
+        logger.info("Database tables created successfully")
     except Exception as e:
-        print(f"WARNING: Database connection failed on startup: {e}")
-        logging.warning(f"Database connection failed: {e}")
+        logger.warning(f"Database connection failed on startup: {e}")
+    
+    yield
+    
+    # Shutdown (if needed in the future)
+    logger.info("Application shutting down")
+
+
+app = FastAPI(title="Fantasy NBA Assistant API", lifespan=lifespan)
 
 # Models
 class TradeRequest(BaseModel):

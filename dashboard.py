@@ -3,8 +3,12 @@ import pandas as pd
 import requests
 import json
 import time
+import os
+import logging
 
-API_URL = "http://localhost:8000"
+logger = logging.getLogger(__name__)
+
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Fantasy NBA Assistant", layout="wide")
 
@@ -50,49 +54,63 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["Dashboard", "Trade Analyzer", "Player E
 # Helper to get players
 @st.cache_data(ttl=60)
 def get_players():
+    """Fetch all players from the API."""
     try:
-        r = requests.get(f"{API_URL}/players")
+        r = requests.get(f"{API_URL}/players", timeout=10)
         if r.status_code == 200:
             return r.json()
-    except:
-        return []
+        logger.warning(f"Failed to fetch players: {r.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching players: {e}")
     return []
+
 
 @st.cache_data(ttl=60)
 def get_stats():
+    """Fetch all player stats with Z-scores from the API."""
     try:
-        r = requests.get(f"{API_URL}/stats")
+        r = requests.get(f"{API_URL}/stats", timeout=10)
         if r.status_code == 200:
             return pd.DataFrame(r.json())
-    except:
-        return pd.DataFrame()
+        logger.warning(f"Failed to fetch stats: {r.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching stats: {e}")
     return pd.DataFrame()
 
+
 def get_teams():
+    """Fetch all fantasy teams from the API."""
     try:
-        r = requests.get(f"{API_URL}/teams")
+        r = requests.get(f"{API_URL}/teams", timeout=10)
         if r.status_code == 200:
             return r.json()
-    except:
-        return []
+        logger.warning(f"Failed to fetch teams: {r.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching teams: {e}")
     return []
+
 
 def get_leagues():
+    """Fetch all leagues from the API."""
     try:
-        r = requests.get(f"{API_URL}/leagues")
+        r = requests.get(f"{API_URL}/leagues", timeout=10)
         if r.status_code == 200:
             return r.json()
-    except:
-        return []
+        logger.warning(f"Failed to fetch leagues: {r.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching leagues: {e}")
     return []
 
-def get_team_players(team_id):
+
+def get_team_players(team_id: int):
+    """Fetch players for a specific team from the API."""
     try:
-        r = requests.get(f"{API_URL}/teams/{team_id}/players")
+        r = requests.get(f"{API_URL}/teams/{team_id}/players", timeout=10)
         if r.status_code == 200:
             return r.json()
-    except:
-        return []
+        logger.warning(f"Failed to fetch team players: {r.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error fetching team players: {e}")
     return []
 
 players = get_players()

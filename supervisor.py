@@ -1,15 +1,15 @@
 from typing import Dict, Any, Type
 from sqlmodel import Session, select
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 import logging
 
-from src.core.models import AgentTask, AuditLog
-import src.core.db  # Import module for late binding of engine
-from src.core.locking import acquire_lock
-from src.core.roto import calculate_roto_standings
-from src.core.importer import RosterImporter
-from src.ingestion.nba_client import NBAClient
+from models import AgentTask, AuditLog, utc_now
+import db as db_module  # Import module for late binding of engine
+from locking import acquire_lock
+from roto import calculate_roto_standings
+from importer import RosterImporter
+from nba_client import NBAClient
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -68,8 +68,8 @@ class IngestionAgent(BaseAgent):
         with acquire_lock(session, "global_ingest"):
             client = NBAClient()
             # Pass the global engine (late bound)
-            client.sync_players(src.core.db.engine, mock=mock) 
-            client.sync_recent_stats(src.core.db.engine, days=days, mock=mock)
+            client.sync_players(db_module.engine, mock=mock) 
+            client.sync_recent_stats(db_module.engine, days=days, mock=mock)
             return {"status": "ingestion_complete"}
 
 class Supervisor:
@@ -87,8 +87,8 @@ class Supervisor:
         """
         Creates a task record. 
         """
-        # Use src.core.db.engine to ensure we get the patched engine during tests
-        with Session(src.core.db.engine) as session:
+        # Use db_module.engine to ensure we get the patched engine during tests
+        with Session(db_module.engine) as session:
             task = AgentTask(task_type=task_type, payload=payload, status="pending")
             session.add(task)
             session.commit()
@@ -100,7 +100,7 @@ class Supervisor:
         """
         Executes a task. Should be called by a worker or BackgroundTask.
         """
-        with Session(src.core.db.engine) as session:
+        with Session(db_module.engine) as session:
             task = session.get(AgentTask, task_id)
             if not task:
                 logger.error(f"Task {task_id} not found")
@@ -128,7 +128,7 @@ class Supervisor:
                     task.error = str(e)
                     task.result = {"traceback": traceback.format_exc()}
                 finally:
-                    task.updated_at = datetime.utcnow()
+                    task.updated_at = utc_now()
                     session.add(task)
                     session.commit()
             else:

@@ -1,8 +1,8 @@
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playergamelog
 from sqlmodel import Session, select
-from src.core.models import Player, PlayerStats
-from src.core.db import engine
+from models import Player, PlayerStats
+from db import engine
 from datetime import datetime, timedelta
 import time
 import pandas as pd

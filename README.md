@@ -66,13 +66,13 @@ You need to run both the Backend API and the Frontend Dashboard.
 
 **Terminal 1: Backend API**
 ```bash
-uvicorn src.api.app:app --reload
+uvicorn app:app --reload
 ```
 *API docs available at: http://localhost:8000/docs*
 
 **Terminal 2: Frontend Dashboard**
 ```bash
-streamlit run src/ui/dashboard.py
+streamlit run dashboard.py
 ```
 *Dashboard available at: http://localhost:8501*
 
@@ -81,22 +81,32 @@ streamlit run src/ui/dashboard.py
 Integration tests use a temporary SQLite database to ensure isolation.
 
 ```bash
-python -m pytest tests/test_integration.py
+python -m pytest test_integration.py -v
 ```
 
 ## 📂 Project Structure
 
 ```
-fantasy_nba/
-├── src/
-│   ├── api/            # FastAPI application endpoints
-│   ├── core/           # Domain logic (Models, Roto Engine, Stats)
-│   ├── ingestion/      # NBA API client and data fetching
-│   └── ui/             # Streamlit dashboard
-├── tests/              # Integration tests
+rotomind/
+├── app.py              # FastAPI application endpoints
+├── models.py           # SQLModel database models
+├── db.py               # Database connection and session management
+├── stats.py            # Z-score calculation engine
+├── roto.py             # Roto standings calculator
+├── analyzer.py         # Trade analysis logic
+├── recommender.py      # Lineup recommendation engine
+├── supervisor.py       # Background task supervisor/agent system
+├── importer.py         # Roster import with fuzzy matching
+├── locking.py          # Database advisory locks
+├── nba_client.py       # NBA API client for data ingestion
+├── dashboard.py        # Streamlit frontend UI
+├── test_integration.py # Integration tests
 ├── requirements.txt    # Python dependencies
+├── .env.example        # Example environment variables
+├── .gitignore          # Git ignore patterns
 ├── ARCHITECTURE.md     # System architecture documentation
-└── DEPLOYMENT.md       # Deployment instructions
+├── DEPLOYMENT.md       # Deployment instructions
+└── README.md           # This file
 ```
 
 ## 📖 Usage Guide

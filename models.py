@@ -1,7 +1,12 @@
 from typing import Optional, List, Dict, Any
 from sqlmodel import Field, SQLModel, Relationship, JSON
-from datetime import date, datetime
+from datetime import date as date_type, datetime, timezone
 import uuid
+
+
+def utc_now() -> datetime:
+    """Return current UTC datetime (timezone-aware)."""
+    return datetime.now(timezone.utc)
 
 # Link table for Many-to-Many relationship
 class TeamRoster(SQLModel, table=True):
@@ -28,9 +33,9 @@ class Player(SQLModel, table=True):
 
 class PlayerStats(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    player_id: int = Field(foreign_key="player.id")
-    game_date: date
-    game_id: str
+    player_id: int = Field(foreign_key="player.id", index=True)
+    game_date: date_type = Field(index=True)
+    game_id: str = Field(index=True)
     matchup: str
     pts: int = 0
     reb: int = 0
@@ -58,9 +63,9 @@ class FantasyTeam(SQLModel, table=True):
 
 class DailyStandings(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    team_id: int = Field(foreign_key="fantasyteam.id")
-    league_id: int = Field(foreign_key="league.id")
-    date: date
+    team_id: int = Field(foreign_key="fantasyteam.id", index=True)
+    league_id: int = Field(foreign_key="league.id", index=True)
+    date: date_type = Field(index=True)
     
     # Raw Totals
     total_pts: int = 0
@@ -98,8 +103,8 @@ class AgentTask(SQLModel, table=True):
     payload: Dict = Field(default={}, sa_type=JSON)
     result: Dict = Field(default={}, sa_type=JSON)
     error: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
 
 class AuditLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -107,5 +112,5 @@ class AuditLog(SQLModel, table=True):
     entity_type: str # "League", "Team"
     entity_id: int
     action: str # "update_roster", "calculate_standings"
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=utc_now)
     details: Dict = Field(default={}, sa_type=JSON)

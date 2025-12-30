@@ -1,5 +1,5 @@
 import pandas as pd
-from src.core.stats import calculate_z_scores, aggregate_player_stats
+from stats import calculate_z_scores, aggregate_player_stats
 
 class TradeAnalyzer:
     def __init__(self, all_player_stats: pd.DataFrame):

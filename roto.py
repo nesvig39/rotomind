@@ -1,10 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 import pandas as pd
-from datetime import date
+from datetime import date as date_type
 from sqlmodel import Session, select
-from src.core.models import League, FantasyTeam, PlayerStats, DailyStandings
+from models import League, FantasyTeam, PlayerStats, DailyStandings
 
-def calculate_roto_standings(session: Session, league_id: int, calculation_date: date = None):
+def calculate_roto_standings(session: Session, league_id: int, calculation_date: Optional[date_type] = None):
     """
     Calculates Roto standings for a league.
     1. Aggregates stats for all players in each team up to calculation_date.
@@ -13,7 +13,7 @@ def calculate_roto_standings(session: Session, league_id: int, calculation_date:
     4. Saves/Returns DailyStandings.
     """
     if calculation_date is None:
-        calculation_date = date.today()
+        calculation_date = date_type.today()
         
     league = session.get(League, league_id)
     if not league or not league.teams:
