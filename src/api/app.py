@@ -58,6 +58,25 @@ class TeamCreate(BaseModel):
 class LeagueCreate(BaseModel):
     name: str
     season: str = "2024-25"
+    espn_league_id: Optional[int] = None
+    espn_s2: Optional[str] = None
+    espn_swid: Optional[str] = None
+
+
+class ESPNConfigUpdate(BaseModel):
+    """Update ESPN integration settings for a league."""
+    espn_league_id: int
+    espn_s2: str
+    espn_swid: str
+
+
+class HybridSyncRequest(BaseModel):
+    """Request for hybrid ESPN + NBA sync."""
+    sync_nba_players: bool = True
+    sync_nba_stats: bool = True
+    sync_espn_rosters: bool = True
+    limit_nba_players: Optional[int] = None
+    mock_nba: bool = False
 
 class PlayerAdd(BaseModel):
     player_id: int
@@ -114,12 +133,158 @@ def get_task_status(task_id: str, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
+
+# --- ESPN Integration Endpoints ---
+
+@app.post("/leagues/{league_id}/configure_espn")
+def configure_espn(
+    league_id: int, 
+    config: ESPNConfigUpdate, 
+    session: Session = Depends(get_session)
+):
+    """
+    Configure ESPN integration for a league.
+    
+    To get ESPN cookies:
+    1. Log into ESPN Fantasy Basketball in your browser
+    2. Open Developer Tools (F12) → Application → Cookies
+    3. Copy the values for 'espn_s2' and 'SWID'
+    """
+    league = session.get(League, league_id)
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    league.espn_league_id = config.espn_league_id
+    league.espn_s2 = config.espn_s2
+    league.espn_swid = config.espn_swid
+    
+    session.add(league)
+    session.commit()
+    session.refresh(league)
+    
+    return {
+        "message": f"ESPN integration configured for league '{league.name}'",
+        "espn_league_id": league.espn_league_id,
+    }
+
+
+@app.post("/leagues/{league_id}/hybrid_sync", response_model=TaskResponse)
+def trigger_hybrid_sync(
+    league_id: int,
+    req: HybridSyncRequest,
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session)
+):
+    """
+    Trigger a hybrid sync (ESPN rosters + NBA stats) for a league.
+    
+    This combines:
+    - ESPN: Rosters (who owns which players)
+    - NBA.com: Player statistics (game-by-game data)
+    
+    The league must have ESPN credentials configured first.
+    """
+    league = session.get(League, league_id)
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    payload = {
+        "league_id": league_id,
+        "sync_nba_players": req.sync_nba_players,
+        "sync_nba_stats": req.sync_nba_stats,
+        "sync_espn_rosters": req.sync_espn_rosters,
+        "limit_nba_players": req.limit_nba_players,
+        "mock_nba": req.mock_nba,
+    }
+    
+    task = Supervisor.submit_task("hybrid_sync", payload)
+    background_tasks.add_task(Supervisor.run_task, task.id)
+    
+    return {"task_id": task.id, "status": "submitted"}
+
+
+@app.post("/leagues/{league_id}/espn_sync", response_model=TaskResponse)
+def trigger_espn_roster_sync(
+    league_id: int,
+    background_tasks: BackgroundTasks,
+    session: Session = Depends(get_session)
+):
+    """
+    Quick sync of rosters from ESPN (without re-syncing NBA stats).
+    
+    Use this for fast roster updates after trades/waiver moves.
+    The league must have ESPN credentials configured.
+    """
+    league = session.get(League, league_id)
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    if not league.espn_league_id:
+        raise HTTPException(
+            status_code=400, 
+            detail="ESPN not configured for this league. Use /configure_espn first."
+        )
+    
+    task = Supervisor.submit_task("espn_roster_sync", {"league_id": league_id})
+    background_tasks.add_task(Supervisor.run_task, task.id)
+    
+    return {"task_id": task.id, "status": "submitted"}
+
+
+@app.get("/leagues/{league_id}/espn_status")
+def get_espn_status(league_id: int, session: Session = Depends(get_session)):
+    """
+    Get ESPN integration status for a league.
+    """
+    league = session.get(League, league_id)
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    return {
+        "league_id": league.id,
+        "league_name": league.name,
+        "espn_configured": league.espn_league_id is not None,
+        "espn_league_id": league.espn_league_id,
+        "last_sync": league.last_espn_sync.isoformat() if league.last_espn_sync else None,
+        "credentials_set": bool(league.espn_s2 and league.espn_swid),
+    }
+
+
 # --- Standard Read Endpoints (Direct DB Access) ---
 
 @app.get("/players")
-def get_players(session: Session = Depends(get_session)):
-    players = session.exec(select(Player)).all()
+def get_players(
+    session: Session = Depends(get_session),
+    active_only: bool = True,
+    limit: int = 100,
+    offset: int = 0,
+):
+    """Get all players with optional filtering."""
+    stmt = select(Player)
+    if active_only:
+        stmt = stmt.where(Player.is_active == True)
+    stmt = stmt.offset(offset).limit(limit)
+    players = session.exec(stmt).all()
     return players
+
+
+@app.get("/players/{player_id}")
+def get_player_detail(player_id: int, session: Session = Depends(get_session)):
+    """
+    Get detailed player information including recent stats.
+    
+    Returns combined data from NBA and ESPN sources.
+    """
+    from src.ingestion.hybrid_client import HybridDataClient
+    
+    player = session.get(Player, player_id)
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    client = HybridDataClient()
+    combined_data = client.get_combined_player_data(session, player_id)
+    
+    return combined_data
 
 @app.get("/stats")
 def get_stats(session: Session = Depends(get_session)):

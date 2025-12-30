@@ -4,12 +4,13 @@ from datetime import datetime, timezone
 import traceback
 import logging
 
-from src.core.models import AgentTask, AuditLog
+from src.core.models import AgentTask, AuditLog, League
 import src.core.db  # Import module for late binding of engine
 from src.core.locking import acquire_lock
 from src.core.roto import calculate_roto_standings
 from src.core.importer import RosterImporter
 from src.ingestion.nba_client import NBAClient
+from src.ingestion.hybrid_client import HybridDataClient
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -66,6 +67,7 @@ class ImportAgent(BaseAgent):
             return report.to_dict()
 
 class IngestionAgent(BaseAgent):
+    """Agent for NBA-only data ingestion."""
     def run(self, session: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
         days = payload.get("days", 15)
         mock = payload.get("mock", False)
@@ -88,14 +90,123 @@ class IngestionAgent(BaseAgent):
                 "stats": stats_result.to_dict(),
             }
 
+
+class HybridSyncAgent(BaseAgent):
+    """
+    Agent for hybrid ESPN + NBA data synchronization.
+    
+    Payload options:
+        - league_id: Local league ID (required for ESPN roster sync)
+        - sync_nba_players: bool (default True)
+        - sync_nba_stats: bool (default True)  
+        - sync_espn_rosters: bool (default True)
+        - limit_nba_players: int (optional, for testing)
+        - mock_nba: bool (default False)
+        
+    If league has ESPN credentials configured, will sync from ESPN.
+    Otherwise, falls back to NBA-only mode.
+    """
+    def run(self, session: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
+        league_id = payload.get("league_id")
+        sync_nba_players = payload.get("sync_nba_players", True)
+        sync_nba_stats = payload.get("sync_nba_stats", True)
+        sync_espn_rosters = payload.get("sync_espn_rosters", True)
+        limit_nba_players = payload.get("limit_nba_players")
+        mock_nba = payload.get("mock_nba", False)
+        
+        with acquire_lock(session, "global_hybrid_sync"):
+            # Get league with ESPN credentials
+            league = None
+            if league_id:
+                league = session.get(League, league_id)
+            
+            # Create hybrid client
+            if league and league.espn_league_id:
+                client = HybridDataClient.from_league(league)
+                logger.info(f"Hybrid sync with ESPN league {league.espn_league_id}")
+            else:
+                client = HybridDataClient()  # NBA-only mode
+                logger.info("Hybrid sync in NBA-only mode (no ESPN credentials)")
+            
+            # Perform hybrid sync
+            result = client.full_sync(
+                db_engine=src.core.db.engine,
+                local_league_id=league_id,
+                sync_nba_players=sync_nba_players,
+                sync_nba_stats=sync_nba_stats,
+                sync_espn_rosters=sync_espn_rosters,
+                limit_nba_players=limit_nba_players,
+                mock_nba=mock_nba,
+            )
+            
+            # Audit log
+            if league_id:
+                audit = AuditLog(
+                    entity_type="League",
+                    entity_id=league_id,
+                    action="hybrid_sync",
+                    details=result.to_dict()
+                )
+                session.add(audit)
+            
+            return result.to_dict()
+
+
+class ESPNRosterSyncAgent(BaseAgent):
+    """
+    Agent for ESPN-only roster synchronization.
+    
+    Use this for quick roster updates without re-syncing NBA stats.
+    
+    Payload:
+        - league_id: Local league ID (required)
+    """
+    def run(self, session: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
+        league_id = payload.get("league_id")
+        
+        if not league_id:
+            raise ValueError("league_id is required")
+        
+        league = session.get(League, league_id)
+        if not league:
+            raise ValueError(f"League {league_id} not found")
+        
+        if not league.espn_league_id:
+            raise ValueError(f"League {league_id} has no ESPN league configured")
+        
+        with acquire_lock(session, f"espn_sync_{league_id}"):
+            client = HybridDataClient.from_league(league)
+            result = client.sync_espn_rosters(session, league_id)
+            
+            # Audit log
+            audit = AuditLog(
+                entity_type="League",
+                entity_id=league_id,
+                action="espn_roster_sync",
+                details=result.to_dict()
+            )
+            session.add(audit)
+            
+            return result.to_dict()
+
+
 class Supervisor:
     """
     Manages task execution and agent delegation.
+    
+    Available task types:
+        - calculate_roto: Calculate Roto standings for a league
+        - import_roster: Import rosters from JSON/manual input
+        - ingest_data: NBA-only data ingestion (legacy)
+        - hybrid_sync: Combined ESPN + NBA data sync
+        - espn_roster_sync: ESPN roster sync only (quick update)
     """
     _agents: Dict[str, Type[BaseAgent]] = {
         "calculate_roto": RotoAgent,
         "import_roster": ImportAgent,
-        "ingest_data": IngestionAgent
+        "ingest_data": IngestionAgent,
+        "hybrid_sync": HybridSyncAgent,
+        "espn_roster_sync": ESPNRosterSyncAgent,
     }
 
     @classmethod
