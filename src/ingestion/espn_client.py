@@ -101,7 +101,7 @@ class ESPNFantasyClient:
     def __init__(
         self, 
         league_id: int,
-        season: int = 2025,
+        season: int = 2026,  # 2025-26 NBA season uses 2026
         espn_s2: Optional[str] = None,
         swid: Optional[str] = None
     ):

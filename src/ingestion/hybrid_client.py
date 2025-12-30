@@ -97,7 +97,7 @@ class HybridDataClient:
         espn_league_id: Optional[int] = None,
         espn_s2: Optional[str] = None,
         espn_swid: Optional[str] = None,
-        espn_season: int = 2025,
+        espn_season: int = 2026,
     ):
         """
         Initialize the hybrid client.
@@ -106,7 +106,7 @@ class HybridDataClient:
             espn_league_id: Your ESPN Fantasy Basketball league ID
             espn_s2: ESPN authentication cookie (from browser)
             espn_swid: ESPN SWID cookie (from browser)
-            espn_season: ESPN season year (2025 = 2024-25 season)
+            espn_season: ESPN season year (2026 = 2025-26 season)
         """
         self.nba_client = NBAClient()
         
