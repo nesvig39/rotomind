@@ -88,9 +88,12 @@ class ESPNFantasyClient:
         2. Open browser developer tools (F12)
         3. Go to Application > Cookies
         4. Copy 'espn_s2' and 'SWID' values
+        
+    IMPORTANT: The espn_s2 cookie should be URL-encoded (keep the %2B etc.)
     """
     
-    BASE_URL = "https://fantasy.espn.com/apis/v3/games/fba/seasons/{season}/segments/0/leagues/{league_id}"
+    # Use lm-api-reads endpoint which works reliably
+    BASE_URL = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/fba/seasons/{season}/segments/0/leagues/{league_id}"
     
     # Rate limiting
     MIN_REQUEST_INTERVAL = 2.0  # Be respectful to ESPN's servers
