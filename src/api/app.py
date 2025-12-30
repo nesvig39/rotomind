@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
@@ -15,15 +16,26 @@ from src.core.analyzer import TradeAnalyzer
 from src.core.recommender import recommend_daily_lineup
 from src.core.supervisor import Supervisor
 
-app = FastAPI(title="Fantasy NBA Assistant API")
+logger = logging.getLogger(__name__)
 
-@app.on_event("startup")
-def on_startup():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan handler for startup/shutdown events."""
+    # Startup
     try:
         create_db_and_tables()
+        logger.info("Database tables created successfully")
     except Exception as e:
-        print(f"WARNING: Database connection failed on startup: {e}")
-        logging.warning(f"Database connection failed: {e}")
+        logger.warning(f"Database connection failed on startup: {e}")
+    
+    yield  # Application runs here
+    
+    # Shutdown (cleanup if needed)
+    logger.info("Application shutting down")
+
+
+app = FastAPI(title="Fantasy NBA Assistant API", lifespan=lifespan)
 
 # Models
 class TradeRequest(BaseModel):

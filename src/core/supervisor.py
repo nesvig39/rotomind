@@ -1,6 +1,6 @@
 from typing import Dict, Any, Type
 from sqlmodel import Session, select
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 import logging
 
@@ -43,34 +43,50 @@ class ImportAgent(BaseAgent):
     def run(self, session: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
         league_id = payload.get("league_id")
         roster_map = payload.get("roster_map")
+        clear_existing = payload.get("clear_existing", False)
         
         if not league_id or not roster_map:
             raise ValueError("league_id and roster_map required")
             
         with acquire_lock(session, f"league_{league_id}"):
             importer = RosterImporter(session)
-            report = importer.process_import(league_id, roster_map)
+            report = importer.process_import(
+                league_id, 
+                roster_map, 
+                clear_existing=clear_existing
+            )
             
             audit = AuditLog(
                 entity_type="League",
                 entity_id=league_id,
                 action="import_rosters",
-                details=report
+                details=report.to_dict()
             )
             session.add(audit)
-            return report
+            return report.to_dict()
 
 class IngestionAgent(BaseAgent):
     def run(self, session: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
         days = payload.get("days", 15)
         mock = payload.get("mock", False)
+        limit_players = payload.get("limit_players")
         
         with acquire_lock(session, "global_ingest"):
             client = NBAClient()
             # Pass the global engine (late bound)
-            client.sync_players(src.core.db.engine, mock=mock) 
-            client.sync_recent_stats(src.core.db.engine, days=days, mock=mock)
-            return {"status": "ingestion_complete"}
+            player_result = client.sync_players(src.core.db.engine, mock=mock)
+            stats_result = client.sync_recent_stats(
+                src.core.db.engine, 
+                days=days, 
+                limit_players=limit_players,
+                mock=mock
+            )
+            
+            return {
+                "status": "ingestion_complete",
+                "players": player_result.to_dict(),
+                "stats": stats_result.to_dict(),
+            }
 
 class Supervisor:
     """
@@ -128,7 +144,7 @@ class Supervisor:
                     task.error = str(e)
                     task.result = {"traceback": traceback.format_exc()}
                 finally:
-                    task.updated_at = datetime.utcnow()
+                    task.updated_at = datetime.now(timezone.utc)
                     session.add(task)
                     session.commit()
             else:
