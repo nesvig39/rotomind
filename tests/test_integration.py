@@ -220,3 +220,93 @@ def test_recommender(client):
     # Check if sorted by z_total descending
     z_scores = [r['z_total'] for r in recommendations]
     assert z_scores == sorted(z_scores, reverse=True)
+
+
+def test_hybrid_sync(client):
+    """Test the hybrid sync endpoint (NBA-only mode without ESPN credentials)."""
+    # Create a league first
+    l_res = client.post("/leagues", json={"name": "Hybrid Test League"})
+    assert l_res.status_code == 200
+    league_id = l_res.json()["id"]
+    
+    # Trigger hybrid sync (will run in NBA-only mode since no ESPN credentials)
+    response = client.post(
+        f"/leagues/{league_id}/hybrid_sync",
+        json={
+            "sync_nba_players": True,
+            "sync_nba_stats": True,
+            "sync_espn_rosters": False,  # Skip ESPN since not configured
+            "mock_nba": True,
+        }
+    )
+    assert response.status_code == 200
+    
+    data = response.json()
+    assert "task_id" in data
+    assert data["status"] == "submitted"
+    
+    # Wait for task
+    task = wait_for_task(client, data["task_id"])
+    assert task["status"] == "completed"
+    
+    # Verify the result contains hybrid sync data
+    result = task["result"]
+    assert "nba" in result
+    assert "espn" in result
+    assert result["nba"]["players_synced"] >= 0
+
+
+def test_espn_configuration(client):
+    """Test ESPN configuration endpoint."""
+    # Create a league
+    l_res = client.post("/leagues", json={"name": "ESPN Config Test League"})
+    league_id = l_res.json()["id"]
+    
+    # Check initial ESPN status
+    status_res = client.get(f"/leagues/{league_id}/espn_status")
+    assert status_res.status_code == 200
+    status = status_res.json()
+    assert status["espn_configured"] == False
+    assert status["credentials_set"] == False
+    
+    # Configure ESPN (with dummy credentials)
+    config_res = client.post(
+        f"/leagues/{league_id}/configure_espn",
+        json={
+            "espn_league_id": 12345678,
+            "espn_s2": "test_espn_s2_cookie",
+            "espn_swid": "test_swid_cookie",
+        }
+    )
+    assert config_res.status_code == 200
+    
+    # Verify configuration
+    status_res = client.get(f"/leagues/{league_id}/espn_status")
+    status = status_res.json()
+    assert status["espn_configured"] == True
+    assert status["espn_league_id"] == 12345678
+    assert status["credentials_set"] == True
+
+
+def test_player_detail(client):
+    """Test player detail endpoint with combined data."""
+    # Ingest mock data
+    ingest_res = client.post("/ingest", json={"days": 5, "mock": True})
+    task = wait_for_task(client, ingest_res.json()["task_id"])
+    assert task["status"] == "completed"
+    
+    players = client.get("/players").json()
+    if not players:
+        pytest.skip("No players found")
+    
+    player_id = players[0]["id"]
+    
+    # Get player detail
+    response = client.get(f"/players/{player_id}")
+    assert response.status_code == 200
+    
+    detail = response.json()
+    assert "id" in detail
+    assert "name" in detail
+    assert "recent_averages" in detail
+    assert "last_games" in detail
