@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotomind Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0b; color: #fafafa; padding: 40px; }
+    h1 { color: #f97316; font-size: 32px; margin-bottom: 8px; }
+    .subtitle { color: #a1a1aa; margin-bottom: 40px; }
+    .screen { border: 1px solid #27272a; border-radius: 16px; margin-bottom: 40px; overflow: hidden; }
+    .screen-label { background: #121214; padding: 12px 20px; font-size: 14px; color: #a1a1aa; border-bottom: 1px solid #27272a; }
+    .layout { display: flex; min-height: 600px; }
+    .sidebar { width: 240px; background: #121214; border-right: 1px solid #27272a; padding: 0; }
+    .sidebar-header { height: 56px; display: flex; align-items: center; padding: 0 16px; gap: 12px; border-bottom: 1px solid #27272a; }
+    .logo { width: 32px; height: 32px; background: #f97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .sidebar nav { padding: 8px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: #a1a1aa; font-size: 14px; margin-bottom: 2px; }
+    .nav-item:hover { background: #252529; color: #fafafa; }
+    .nav-item.active { background: rgba(249,115,22,0.1); color: #f97316; border: 1px solid rgba(249,115,22,0.2); }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .header { height: 56px; background: #121214; border-bottom: 1px solid #27272a; display: flex; align-items: center; justify-content: center; padding: 0 24px; }
+    .search { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #252529; border: 1px solid #27272a; border-radius: 8px; width: 280px; font-size: 14px; color: #a1a1aa; }
+    .search kbd { margin-left: auto; padding: 2px 6px; background: #121214; border: 1px solid #27272a; border-radius: 4px; font-size: 11px; }
+    .content { flex: 1; padding: 24px; overflow: auto; }
+    .banner { background: linear-gradient(135deg, rgba(249,115,22,0.1), rgba(249,115,22,0.05)); border: 1px solid rgba(249,115,22,0.2); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .banner h2 { font-size: 24px; margin-bottom: 4px; }
+    .banner p { color: #a1a1aa; font-size: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat { background: #121214; border: 1px solid #27272a; border-radius: 12px; padding: 20px; }
+    .stat.success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+    .stat .label { font-size: 13px; color: #a1a1aa; margin-bottom: 8px; }
+    .stat .value { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .stat .change { font-size: 13px; color: #22c55e; }
+    .card { background: #121214; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; }
+    .card-content { padding: 20px; }
+    .players { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .player { background: #121214; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; }
+    .player .rec { padding: 8px 12px; font-size: 12px; font-weight: 600; }
+    .player .rec.start { background: rgba(34,197,94,0.1); color: #22c55e; }
+    .player .rec.bench { background: rgba(245,158,11,0.1); color: #f59e0b; }
+    .player-body { padding: 16px; }
+    .player-info { display: flex; gap: 12px; margin-bottom: 12px; }
+    .avatar { width: 48px; height: 48px; background: #252529; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .player-name { font-weight: 600; }
+    .player-meta { font-size: 13px; color: #a1a1aa; }
+    .z-score { display: flex; align-items: center; gap: 8px; }
+    .z-label { font-size: 12px; color: #71717a; }
+    .z-value { font-size: 18px; font-weight: 700; color: #22c55e; }
+    .cols { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px; }
+    .cat-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .cat-label { width: 36px; font-size: 12px; font-weight: 600; }
+    .cat-bar { flex: 1; height: 12px; background: #252529; border-radius: 6px; overflow: hidden; }
+    .cat-fill { height: 100%; border-radius: 6px; }
+    .cat-rank { width: 40px; font-size: 13px; color: #a1a1aa; text-align: right; }
+    .waiver { display: flex; justify-content: space-between; padding: 12px; background: #252529; border-radius: 8px; margin-bottom: 8px; }
+    .waiver .change { color: #22c55e; font-weight: 600; }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, #27272a, transparent); margin: 40px 0; }
+    .mobile { width: 375px; margin: 0 auto; border: 8px solid #1a1a1d; border-radius: 40px; overflow: hidden; }
+    .mobile-header { height: 48px; background: #121214; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #27272a; }
+    .mobile-content { height: 600px; padding: 16px; overflow: auto; }
+    .mobile-nav { display: flex; background: #121214; border-top: 1px solid #27272a; }
+    .mobile-nav-item { flex: 1; padding: 12px 8px; text-align: center; font-size: 10px; color: #71717a; }
+    .mobile-nav-item.active { color: #f97316; }
+    .mobile-nav-item .icon { font-size: 20px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <h1>🏀 Rotomind Mockups</h1>
+  <p class="subtitle">Databricks One-inspired UI for Fantasy NBA</p>
+
+  <!-- Screen 1: Dashboard -->
+  <div class="screen">
+    <div class="screen-label">Screen 1: Command Center — 1440×900</div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">🏀</div>
+          <span style="font-weight:600;font-size:18px">Rotomind</span>
+        </div>
+        <nav>
+          <div class="nav-item active"><span>📊</span> Command Center</div>
+          <div class="nav-item"><span>🏆</span> Leagues</div>
+          <div class="nav-item"><span>👥</span> My Teams</div>
+          <div class="nav-item"><span>👤</span> Players</div>
+          <div class="nav-item"><span>🔄</span> Trade Analyzer</div>
+          <div style="height:1px;background:#27272a;margin:12px 0"></div>
+          <div style="padding:12px;background:rgba(249,115,22,0.05);border:1px solid rgba(249,115,22,0.2);border-radius:8px;margin:8px">
+            <div style="display:flex;gap:6px;font-size:13px;font-weight:600;margin-bottom:4px">✨ Start Maxey Tonight</div>
+            <div style="font-size:12px;color:#a1a1aa">Higher ceiling vs ORL than Jrue Holiday.</div>
+          </div>
+          <div class="nav-item"><span>⚙️</span> Settings</div>
+        </nav>
+      </aside>
+      <main class="main">
+        <header class="header">
+          <div class="search"><span>🔍</span> Search or command... <kbd>⌘K</kbd></div>
+        </header>
+        <div class="content">
+          <div class="banner">
+            <h2>📊 Command Center</h2>
+            <p>Good morning! You have 3 players with games today.</p>
+          </div>
+          <div class="stats">
+            <div class="stat success">
+              <div class="label">🏆 Standings Rank</div>
+              <div class="value">3rd of 12</div>
+              <div class="change">▲ +2 from last week</div>
+            </div>
+            <div class="stat">
+              <div class="label">📈 Z-Score Trend</div>
+              <div class="value">+15.8</div>
+              <div class="change">▲ +2.3 this week</div>
+            </div>
+            <div class="stat" style="background:rgba(249,115,22,0.05);border-color:rgba(249,115,22,0.2)">
+              <div style="display:flex;gap:12px">
+                <div style="padding:8px;background:rgba(249,115,22,0.1);border-radius:8px">✨</div>
+                <div>
+                  <div style="font-weight:600;margin-bottom:4px">AI Insight</div>
+                  <div style="font-size:13px;color:#a1a1aa">"Start Tyrese Maxey over Jrue Holiday today."</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:24px">
+            <div class="card-header">📅 Today's Lineup Recommendations</div>
+            <div class="card-content">
+              <div class="players">
+                <div class="player">
+                  <div class="rec start">✅ START</div>
+                  <div class="player-body">
+                    <div class="player-info">
+                      <div class="avatar">🏀</div>
+                      <div><div class="player-name">Stephen Curry</div><div class="player-meta">PG • GSW</div></div>
+                    </div>
+                    <div class="z-score"><span class="z-label">Z-Score:</span><span class="z-value">+3.2</span></div>
+                  </div>
+                </div>
+                <div class="player">
+                  <div class="rec start">✅ START</div>
+                  <div class="player-body">
+                    <div class="player-info">
+                      <div class="avatar">🏀</div>
+                      <div><div class="player-name">LeBron James</div><div class="player-meta">SF • LAL</div></div>
+                    </div>
+                    <div class="z-score"><span class="z-label">Z-Score:</span><span class="z-value">+2.8</span></div>
+                  </div>
+                </div>
+                <div class="player">
+                  <div class="rec bench">⚠️ BENCH</div>
+                  <div class="player-body">
+                    <div class="player-info">
+                      <div class="avatar">🏀</div>
+                      <div><div class="player-name">Kyrie Irving</div><div class="player-meta">PG • DAL</div></div>
+                    </div>
+                    <div class="z-score"><span class="z-label">Z-Score:</span><span class="z-value" style="color:#f59e0b">+1.1</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cols">
+            <div class="card">
+              <div class="card-header">📊 Category Breakdown</div>
+              <div class="card-content">
+                <div class="cat-row"><span class="cat-label" style="color:#8b5cf6">PTS</span><div class="cat-bar"><div class="cat-fill" style="width:58%;background:#8b5cf6"></div></div><span class="cat-rank">7th</span><span style="color:#22c55e">▲</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#06b6d4">REB</span><div class="cat-bar"><div class="cat-fill" style="width:75%;background:#06b6d4"></div></div><span class="cat-rank">4th</span><span style="color:#22c55e">▲</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#10b981">AST</span><div class="cat-bar"><div class="cat-fill" style="width:92%;background:#10b981"></div></div><span class="cat-rank">2nd</span><span style="color:#71717a">→</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#f59e0b">STL</span><div class="cat-bar"><div class="cat-fill" style="width:33%;background:#f59e0b"></div></div><span class="cat-rank">9th</span><span style="color:#ef4444">▼</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#ef4444">BLK</span><div class="cat-bar"><div class="cat-fill" style="width:58%;background:#ef4444"></div></div><span class="cat-rank">6th</span><span style="color:#22c55e">▲</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#3b82f6">3PM</span><div class="cat-bar"><div class="cat-fill" style="width:67%;background:#3b82f6"></div></div><span class="cat-rank">5th</span><span style="color:#71717a">→</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#ec4899">FG%</span><div class="cat-bar"><div class="cat-fill" style="width:83%;background:#ec4899"></div></div><span class="cat-rank">3rd</span><span style="color:#22c55e">▲</span></div>
+                <div class="cat-row"><span class="cat-label" style="color:#a855f7">FT%</span><div class="cat-bar"><div class="cat-fill" style="width:67%;background:#a855f7"></div></div><span class="cat-rank">5th</span><span style="color:#71717a">→</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">🔥 Hot on Waiver Wire</div>
+              <div class="card-content">
+                <div class="waiver"><span><b style="color:#71717a;margin-right:8px">1.</b> Cason Wallace</span><span class="change">+2.1 Z</span></div>
+                <div class="waiver"><span><b style="color:#71717a;margin-right:8px">2.</b> Jalen Williams</span><span class="change">+1.8 Z</span></div>
+                <div class="waiver"><span><b style="color:#71717a;margin-right:8px">3.</b> Keegan Murray</span><span class="change">+1.5 Z</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Screen 2: Mobile -->
+  <div class="screen">
+    <div class="screen-label">Screen 2: Mobile View — 375×812</div>
+    <div style="padding:40px;display:flex;justify-content:center">
+      <div class="mobile">
+        <div class="mobile-header">
+          <div style="display:flex;align-items:center;gap:8px"><div class="logo" style="width:28px;height:28px;font-size:14px">🏀</div><span style="font-weight:600">Rotomind</span></div>
+          <div style="display:flex;gap:8px"><span>🔔</span><span>≡</span></div>
+        </div>
+        <div class="mobile-content">
+          <h2 style="font-size:20px;margin-bottom:4px">📊 Command Center</h2>
+          <p style="font-size:13px;color:#a1a1aa;margin-bottom:16px">Fri, Jan 3, 2025</p>
+          <div class="stat success" style="margin-bottom:12px;padding:16px"><div class="label">🏆 Standings</div><div class="value" style="font-size:24px">3rd of 12</div><div class="change">▲ +2 from last week</div></div>
+          <div class="stat" style="margin-bottom:12px;padding:16px"><div class="label">📈 Z-Score</div><div class="value" style="font-size:24px">+15.8</div><div class="change">▲ +2.3 this week</div></div>
+          <div style="padding:12px;background:rgba(249,115,22,0.05);border:1px solid rgba(249,115,22,0.2);border-radius:8px;margin-bottom:16px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:4px">💡 AI Insight</div>
+            <div style="font-size:12px;color:#a1a1aa">"Start Maxey over Holiday tonight."</div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header" style="padding:12px 16px;font-size:14px">📅 Today's Lineup</div>
+            <div class="card-content" style="padding:12px 16px">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #27272a"><span style="color:#22c55e">✅</span><span style="font-weight:500">Stephen Curry</span><span style="margin-left:auto;color:#22c55e;font-size:13px">+3.2</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #27272a"><span style="color:#22c55e">✅</span><span style="font-weight:500">LeBron James</span><span style="margin-left:auto;color:#22c55e;font-size:13px">+2.8</span></div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0"><span style="color:#f59e0b">⚠️</span><span style="font-weight:500">Kyrie Irving</span><span style="margin-left:auto;color:#f59e0b;font-size:13px">+1.1</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-nav">
+          <div class="mobile-nav-item active"><div class="icon">📊</div>Home</div>
+          <div class="mobile-nav-item"><div class="icon">🏆</div>Leagues</div>
+          <div class="mobile-nav-item"><div class="icon">👥</div>Teams</div>
+          <div class="mobile-nav-item"><div class="icon">🔄</div>Trade</div>
+          <div class="mobile-nav-item"><div class="icon">⚙️</div>Settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:40px;color:#a1a1aa">
+    <p>🏀 Rotomind Figma Prototype</p>
+    <p style="font-size:14px;margin-top:8px">Copy this HTML file to your local machine and open in browser</p>
+  </div>
+</body>
+</html>

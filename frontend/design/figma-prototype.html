@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotomind - Figma Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Background */
+      --bg-base: #0a0a0b;
+      --bg-surface: #121214;
+      --bg-elevated: #1a1a1d;
+      --bg-hover: #252529;
+      
+      /* Brand */
+      --brand: #f97316;
+      --brand-secondary: #ea580c;
+      --brand-muted: #431407;
+      
+      /* Semantic */
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      
+      /* Text */
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-tertiary: #71717a;
+      
+      /* Border */
+      --border: #27272a;
+      --border-hover: #3f3f46;
+      
+      /* Categories */
+      --cat-pts: #8b5cf6;
+      --cat-reb: #06b6d4;
+      --cat-ast: #10b981;
+      --cat-stl: #f59e0b;
+      --cat-blk: #ef4444;
+      --cat-tpm: #3b82f6;
+      --cat-fg: #ec4899;
+      --cat-ft: #a855f7;
+      
+      /* Spacing */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      
+      /* Radius */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    
+    /* Screen Container */
+    .screen-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .screen-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--brand);
+    }
+    
+    .screen-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+    
+    .screen-frame {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 60px;
+      background: var(--bg-base);
+    }
+    
+    .screen-label {
+      background: var(--bg-surface);
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    /* Layout */
+    .app-layout {
+      display: flex;
+      height: 800px;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: var(--brand);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .logo-text {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+    
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .nav-item.active {
+      background: rgba(249, 115, 22, 0.1);
+      color: var(--brand);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+    }
+    
+    .nav-icon {
+      font-size: 18px;
+    }
+    
+    .nav-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+    
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+    }
+    
+    .ai-insight-card {
+      margin: 8px;
+      padding: 12px;
+      background: rgba(249, 115, 22, 0.05);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: var(--radius-md);
+    }
+    
+    .ai-insight-card .title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .ai-insight-card .text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Header */
+    .header {
+      height: 56px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      width: 280px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .search-bar kbd {
+      margin-left: auto;
+      padding: 2px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: inherit;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 18px;
+      position: relative;
+    }
+    
+    .icon-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .icon-btn .badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--brand);
+      border-radius: 50%;
+    }
+    
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    /* Welcome Banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05));
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .welcome-banner h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .welcome-banner p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .welcome-banner .date {
+      color: var(--text-secondary);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      transition: all 0.15s;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-elevated);
+    }
+    
+    .stat-card.success {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.05);
+    }
+    
+    .stat-card .label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .stat-card .change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+    
+    .stat-card .change.positive {
+      color: var(--success);
+    }
+    
+    .stat-card .change.negative {
+      color: var(--error);
+    }
+    
+    .stat-card .icon-wrapper {
+      float: right;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-hover);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    /* Card */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card-action {
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card-action:hover {
+      color: var(--text-primary);
+    }
+    
+    .card-content {
+      padding: 20px;
+    }
+    
+    /* Player Cards Grid */
+    .player-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .player-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.15s;
+    }
+    
+    .player-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+    
+    .player-card .recommendation {
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .player-card .recommendation.start {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+    }
+    
+    .player-card .recommendation.bench {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .player-card-content {
+      padding: 16px;
+    }
+    
+    .player-card .player-info {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .player-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-hover);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .player-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+    
+    .player-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .player-card .z-score {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .player-card .z-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .player-card .z-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--success);
+    }
+    
+    .player-card .z-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .player-card .z-stat {
+      text-align: center;
+    }
+    
+    .player-card .z-stat-label {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-bottom: 2px;
+    }
+    
+    .player-card .z-stat-value {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .z-positive { color: var(--success); }
+    .z-negative { color: var(--error); }
+    
+    /* Two Column Layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    /* Category Bars */
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .category-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .category-label {
+      width: 36px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .category-bar-bg {
+      flex: 1;
+      height: 12px;
+      background: var(--bg-hover);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .category-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.5s ease;
+    }
+    
+    .category-rank {
+      width: 40px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    
+    .category-trend {
+      width: 16px;
+      font-size: 10px;
+    }
+    
+    /* Waiver List */
+    .waiver-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .waiver-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--bg-hover);
+      border-radius: var(--radius-md);
+    }
+    
+    .waiver-item .rank {
+      color: var(--text-tertiary);
+      font-weight: 500;
+      margin-right: 12px;
+    }
+    
+    .waiver-item .name {
+      font-weight: 500;
+    }
+    
+    .waiver-item .change {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    /* Button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--brand-secondary);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    
+    .btn-outline:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    /* Trade Builder */
+    .trade-builder {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .trade-side {
+      padding: 20px;
+    }
+    
+    .trade-side:first-child {
+      border-right: 1px solid var(--border);
+    }
+    
+    .trade-side-header {
+      margin-bottom: 16px;
+    }
+    
+    .trade-side-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .trade-side-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .trade-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+    
+    .trade-player .remove {
+      margin-left: auto;
+      color: var(--text-tertiary);
+      cursor: pointer;
+    }
+    
+    .trade-player .remove:hover {
+      color: var(--error);
+    }
+    
+    .trade-total {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 16px;
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+    }
+    
+    .trade-total .value {
+      font-weight: 700;
+    }
+    
+    .trade-total .value.negative {
+      color: var(--error);
+    }
+    
+    .trade-total .value.positive {
+      color: var(--success);
+    }
+    
+    .trade-action {
+      padding: 16px 20px;
+      background: var(--bg-hover);
+    }
+    
+    /* Trade Impact */
+    .trade-results {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    .impact-overall {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--bg-hover);
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+    }
+    
+    .impact-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--success);
+    }
+    
+    .verdict-box {
+      padding: 20px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid var(--success);
+      border-radius: var(--radius-lg);
+    }
+    
+    .verdict-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--success);
+      margin-bottom: 12px;
+    }
+    
+    .verdict-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .verdict-rank {
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    
+    .verdict-rank span {
+      font-weight: 600;
+    }
+    
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-hover);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    td {
+      font-size: 14px;
+    }
+    
+    tr:hover td {
+      background: var(--bg-hover);
+    }
+    
+    .table-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 999px;
+      background: var(--bg-hover);
+      color: var(--text-secondary);
+    }
+    
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .pagination-buttons {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .pagination-btn {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    
+    .pagination-btn:hover {
+      background: var(--bg-hover);
+    }
+    
+    .pagination-btn.active {
+      background: rgba(249, 115, 22, 0.1);
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 12px;
+    }
+    
+    .quick-stat {
+      text-align: center;
+      padding: 12px;
+      background: var(--bg-hover);
+      border-radius: var(--radius-md);
+    }
+    
+    .quick-stat .label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+    
+    .quick-stat .value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    /* Command Palette */
+    .cmd-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15vh;
+      z-index: 100;
+    }
+    
+    .cmd-dialog {
+      width: 560px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    
+    .cmd-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .cmd-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      color: var(--text-primary);
+      outline: none;
+    }
+    
+    .cmd-input::placeholder {
+      color: var(--text-tertiary);
+    }
+    
+    .cmd-list {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    
+    .cmd-group-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .cmd-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .cmd-item.selected {
+      background: rgba(249, 115, 22, 0.1);
+      color: var(--brand);
+    }
+    
+    .cmd-item .shortcut {
+      margin-left: auto;
+      padding: 2px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    
+    .cmd-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .cmd-footer-left {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .cmd-footer kbd {
+      padding: 2px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+    
+    /* Divider between screens */
+    .screen-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 60px 0;
+    }
+    
+    /* Mobile Frame */
+    .mobile-frame {
+      width: 375px;
+      margin: 0 auto;
+      background: var(--bg-base);
+      border-radius: 40px;
+      border: 8px solid #1a1a1d;
+      overflow: hidden;
+    }
+    
+    .mobile-header {
+      height: 48px;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .mobile-content {
+      height: 700px;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    
+    .mobile-bottom-nav {
+      display: flex;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+    }
+    
+    .mobile-nav-item {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+    
+    .mobile-nav-item.active {
+      color: var(--brand);
+    }
+    
+    .mobile-nav-item .icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-container">
+    <h1 class="screen-title">🏀 Rotomind - Figma Prototype</h1>
+    <p class="screen-subtitle">Databricks One-inspired UI designs for Fantasy NBA Intelligence Platform</p>
+    
+    <!-- Screen 1: Command Center -->
+    <div class="screen-frame">
+      <div class="screen-label">Screen 1: Command Center (Dashboard) — 1440×900</div>
+      <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="logo">🏀</div>
+            <span class="logo-text">Rotomind</span>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item active">
+              <span class="nav-icon">📊</span>
+              Command Center
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">🏆</span>
+              Leagues
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">👥</span>
+              My Teams
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">👤</span>
+              Players
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">🔄</span>
+              Trade Analyzer
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-section-title">AI Insights</div>
+            
+            <div class="ai-insight-card">
+              <div class="title">
+                <span>✨</span>
+                Start Maxey Tonight
+              </div>
+              <div class="text">Tyrese Maxey has a higher ceiling vs ORL than Jrue Holiday.</div>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              Settings
+            </div>
+          </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+          <header class="header">
+            <div class="header-left"></div>
+            <div class="search-bar">
+              <span>🔍</span>
+              Search or command...
+              <kbd>⌘K</kbd>
+            </div>
+            <div class="header-right">
+              <div class="icon-btn">
+                🔔
+                <div class="badge"></div>
+              </div>
+              <div class="icon-btn">👤</div>
+              <div class="icon-btn">◐</div>
+            </div>
+          </header>
+          
+          <div class="content-area">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+              <div>
+                <h1>📊 Command Center</h1>
+                <p>Good morning! You have 3 players with games today.</p>
+              </div>
+              <div class="date">
+                📅 Friday, Jan 3, 2025
+              </div>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+              <div class="stat-card success">
+                <div class="icon-wrapper">🏆</div>
+                <div class="label">Standings Rank</div>
+                <div class="value">3rd of 12</div>
+                <div class="change positive">▲ +2 from last week</div>
+              </div>
+              
+              <div class="stat-card">
+                <div class="label">Z-Score Trend</div>
+                <div class="value">+15.8</div>
+                <div class="change positive">▲ +2.3 this week</div>
+              </div>
+              
+              <div class="stat-card" style="background: rgba(249, 115, 22, 0.05); border-color: rgba(249, 115, 22, 0.2);">
+                <div style="display: flex; gap: 12px;">
+                  <div style="padding: 8px; background: rgba(249, 115, 22, 0.1); border-radius: 8px;">✨</div>
+                  <div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">AI Insight</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">"Consider starting Tyrese Maxey over Jrue Holiday today."</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Today's Lineup -->
+            <div class="card" style="margin-bottom: 24px;">
+              <div class="card-header">
+                <div class="card-title">📅 Today's Lineup Recommendations</div>
+                <div class="card-action">View All →</div>
+              </div>
+              <div class="card-content">
+                <div class="player-cards-grid">
+                  <div class="player-card">
+                    <div class="recommendation start">✅ START</div>
+                    <div class="player-card-content">
+                      <div class="player-info">
+                        <div class="player-avatar">🏀</div>
+                        <div>
+                          <div class="player-name">Stephen Curry</div>
+                          <div class="player-meta">PG • GSW</div>
+                        </div>
+                      </div>
+                      <div class="z-score">
+                        <span class="z-label">Z-Score:</span>
+                        <span class="z-value">+3.2</span>
+                      </div>
+                      <div class="z-stats">
+                        <div class="z-stat">
+                          <div class="z-stat-label">PTS</div>
+                          <div class="z-stat-value z-positive">+2.8</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">REB</div>
+                          <div class="z-stat-value z-positive">+0.1</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">AST</div>
+                          <div class="z-stat-value z-positive">+1.2</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">STL</div>
+                          <div class="z-stat-value z-positive">+0.5</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="player-card">
+                    <div class="recommendation start">✅ START</div>
+                    <div class="player-card-content">
+                      <div class="player-info">
+                        <div class="player-avatar">🏀</div>
+                        <div>
+                          <div class="player-name">LeBron James</div>
+                          <div class="player-meta">SF • LAL</div>
+                        </div>
+                      </div>
+                      <div class="z-score">
+                        <span class="z-label">Z-Score:</span>
+                        <span class="z-value">+2.8</span>
+                      </div>
+                      <div class="z-stats">
+                        <div class="z-stat">
+                          <div class="z-stat-label">PTS</div>
+                          <div class="z-stat-value z-positive">+2.4</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">REB</div>
+                          <div class="z-stat-value z-positive">+1.8</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">AST</div>
+                          <div class="z-stat-value z-positive">+2.1</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">STL</div>
+                          <div class="z-stat-value z-positive">+0.3</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="player-card">
+                    <div class="recommendation bench">⚠️ BENCH</div>
+                    <div class="player-card-content">
+                      <div class="player-info">
+                        <div class="player-avatar">🏀</div>
+                        <div>
+                          <div class="player-name">Kyrie Irving</div>
+                          <div class="player-meta">PG • DAL</div>
+                        </div>
+                      </div>
+                      <div class="z-score">
+                        <span class="z-label">Z-Score:</span>
+                        <span class="z-value" style="color: var(--warning);">+1.1</span>
+                      </div>
+                      <div class="z-stats">
+                        <div class="z-stat">
+                          <div class="z-stat-label">PTS</div>
+                          <div class="z-stat-value z-positive">+1.8</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">REB</div>
+                          <div class="z-stat-value z-negative">-0.4</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">AST</div>
+                          <div class="z-stat-value z-positive">+0.6</div>
+                        </div>
+                        <div class="z-stat">
+                          <div class="z-stat-label">STL</div>
+                          <div class="z-stat-value z-positive">+0.2</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Two Column -->
+            <div class="two-col">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">📊 Category Breakdown</div>
+                </div>
+                <div class="card-content">
+                  <div class="category-list">
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-pts);">PTS</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 58%; background: var(--cat-pts);"></div>
+                      </div>
+                      <span class="category-rank">7th</span>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-reb);">REB</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 75%; background: var(--cat-reb);"></div>
+                      </div>
+                      <span class="category-rank">4th</span>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-ast);">AST</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 92%; background: var(--cat-ast);"></div>
+                      </div>
+                      <span class="category-rank">2nd</span>
+                      <span class="category-trend" style="color: var(--text-tertiary);">→</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-stl);">STL</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 33%; background: var(--cat-stl);"></div>
+                      </div>
+                      <span class="category-rank">9th</span>
+                      <span class="category-trend" style="color: var(--error);">▼</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-blk);">BLK</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 58%; background: var(--cat-blk);"></div>
+                      </div>
+                      <span class="category-rank">6th</span>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-tpm);">3PM</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 67%; background: var(--cat-tpm);"></div>
+                      </div>
+                      <span class="category-rank">5th</span>
+                      <span class="category-trend" style="color: var(--text-tertiary);">→</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-fg);">FG%</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 83%; background: var(--cat-fg);"></div>
+                      </div>
+                      <span class="category-rank">3rd</span>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-ft);">FT%</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 67%; background: var(--cat-ft);"></div>
+                      </div>
+                      <span class="category-rank">5th</span>
+                      <span class="category-trend" style="color: var(--text-tertiary);">→</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">🔥 Hot on Waiver Wire</div>
+                </div>
+                <div class="card-content">
+                  <div class="waiver-list">
+                    <div class="waiver-item">
+                      <span class="rank">1.</span>
+                      <span class="name">Cason Wallace</span>
+                      <span class="change">+2.1 Z</span>
+                    </div>
+                    <div class="waiver-item">
+                      <span class="rank">2.</span>
+                      <span class="name">Jalen Williams</span>
+                      <span class="change">+1.8 Z</span>
+                    </div>
+                    <div class="waiver-item">
+                      <span class="rank">3.</span>
+                      <span class="name">Keegan Murray</span>
+                      <span class="change">+1.5 Z</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-outline btn-full" style="margin-top: 16px;">
+                    Analyze Pickups →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <div class="screen-divider"></div>
+    
+    <!-- Screen 2: Trade Analyzer -->
+    <div class="screen-frame">
+      <div class="screen-label">Screen 2: Trade Analyzer — 1440×900</div>
+      <div class="app-layout">
+        <!-- Sidebar (collapsed version indicator) -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="logo">🏀</div>
+            <span class="logo-text">Rotomind</span>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item">
+              <span class="nav-icon">📊</span>
+              Command Center
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">🏆</span>
+              Leagues
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">👥</span>
+              My Teams
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">👤</span>
+              Players
+            </div>
+            <div class="nav-item active">
+              <span class="nav-icon">🔄</span>
+              Trade Analyzer
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              Settings
+            </div>
+          </nav>
+        </aside>
+        
+        <main class="main-content">
+          <header class="header">
+            <div class="header-left"></div>
+            <div class="search-bar">
+              <span>🔍</span>
+              Search or command...
+              <kbd>⌘K</kbd>
+            </div>
+            <div class="header-right">
+              <div class="icon-btn">🔔</div>
+              <div class="icon-btn">👤</div>
+              <div class="icon-btn">◐</div>
+            </div>
+          </header>
+          
+          <div class="content-area">
+            <div style="margin-bottom: 24px;">
+              <h1 style="font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                🔄 Trade Analyzer
+              </h1>
+              <p style="color: var(--text-secondary);">Build and analyze trades with real-time Z-score impact analysis.</p>
+            </div>
+            
+            <!-- Trade Builder -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Trade Builder</div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-ghost">↔️ Swap</button>
+                  <button class="btn btn-ghost">Clear</button>
+                </div>
+              </div>
+              
+              <div class="trade-builder">
+                <div class="trade-side">
+                  <div class="trade-side-header">
+                    <div class="trade-side-title">📤 You Send</div>
+                    <div class="trade-side-subtitle">Select players to trade away</div>
+                  </div>
+                  
+                  <div class="trade-player">
+                    <div class="player-avatar" style="width: 36px; height: 36px; font-size: 18px;">🏀</div>
+                    <div>
+                      <div style="font-weight: 500;">Jayson Tatum</div>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Z: +4.2 | SF</div>
+                    </div>
+                    <span class="remove">✕</span>
+                  </div>
+                  
+                  <div class="trade-player">
+                    <div class="player-avatar" style="width: 36px; height: 36px; font-size: 18px;">🏀</div>
+                    <div>
+                      <div style="font-weight: 500;">Marcus Smart</div>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Z: +1.3 | PG</div>
+                    </div>
+                    <span class="remove">✕</span>
+                  </div>
+                  
+                  <button class="btn btn-outline btn-full" style="margin-top: 8px;">+ Add Player</button>
+                  
+                  <div class="trade-total">
+                    <span>Total Z-Score:</span>
+                    <span class="value negative">-5.5</span>
+                  </div>
+                </div>
+                
+                <div class="trade-side">
+                  <div class="trade-side-header">
+                    <div class="trade-side-title">📥 You Receive</div>
+                    <div class="trade-side-subtitle">Select players to acquire</div>
+                  </div>
+                  
+                  <div class="trade-player">
+                    <div class="player-avatar" style="width: 36px; height: 36px; font-size: 18px;">🏀</div>
+                    <div>
+                      <div style="font-weight: 500;">Damian Lillard</div>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Z: +3.8 | PG</div>
+                    </div>
+                    <span class="remove">✕</span>
+                  </div>
+                  
+                  <div class="trade-player">
+                    <div class="player-avatar" style="width: 36px; height: 36px; font-size: 18px;">🏀</div>
+                    <div>
+                      <div style="font-weight: 500;">Desmond Bane</div>
+                      <div style="font-size: 12px; color: var(--text-secondary);">Z: +1.9 | SG</div>
+                    </div>
+                    <span class="remove">✕</span>
+                  </div>
+                  
+                  <button class="btn btn-outline btn-full" style="margin-top: 8px;">+ Add Player</button>
+                  
+                  <div class="trade-total">
+                    <span>Total Z-Score:</span>
+                    <span class="value positive">+5.7</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="trade-action">
+                <button class="btn btn-primary btn-full" style="font-size: 15px; padding: 12px;">
+                  🔄 Analyze Trade
+                </button>
+              </div>
+            </div>
+            
+            <!-- Trade Results -->
+            <div class="trade-results">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Your Team Impact</div>
+                </div>
+                <div class="card-content">
+                  <div class="impact-overall">
+                    <span style="color: var(--text-secondary);">Overall Impact:</span>
+                    <div class="impact-value">
+                      ▲ +0.2 Z-Score
+                    </div>
+                  </div>
+                  
+                  <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Category Changes:</div>
+                  <div class="category-list">
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-pts);">PTS</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 75%; background: var(--cat-pts);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-reb);">REB</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 58%; background: var(--cat-reb);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--error);">▼</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-ast);">AST</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 92%; background: var(--cat-ast);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-stl);">STL</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 75%; background: var(--cat-stl);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--success);">▲▲</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-blk);">BLK</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 67%; background: var(--cat-blk);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--error);">▼</span>
+                    </div>
+                    <div class="category-row">
+                      <span class="category-label" style="color: var(--cat-tpm);">3PM</span>
+                      <div class="category-bar-bg">
+                        <div class="category-bar-fill" style="width: 83%; background: var(--cat-tpm);"></div>
+                      </div>
+                      <span class="category-trend" style="color: var(--success);">▲</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Verdict</div>
+                </div>
+                <div class="card-content">
+                  <div class="verdict-box">
+                    <div class="verdict-header">
+                      ✅ ACCEPT
+                    </div>
+                    <div class="verdict-text">
+                      This trade improves your weakest category (STL) while maintaining your strengths.
+                    </div>
+                    <div class="verdict-rank">
+                      Projected Rank: <span>3 → 2</span>
+                      <span style="color: var(--success); margin-left: 4px;">(↑1)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <div class="screen-divider"></div>
+    
+    <!-- Screen 3: Player Explorer -->
+    <div class="screen-frame">
+      <div class="screen-label">Screen 3: Player Explorer — 1440×900</div>
+      <div class="app-layout">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="logo">🏀</div>
+            <span class="logo-text">Rotomind</span>
+          </div>
+          <nav class="sidebar-nav">
+            <div class="nav-item">
+              <span class="nav-icon">📊</span>
+              Command Center
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">🏆</span>
+              Leagues
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">👥</span>
+              My Teams
+            </div>
+            <div class="nav-item active">
+              <span class="nav-icon">👤</span>
+              Players
+            </div>
+            <div class="nav-item">
+              <span class="nav-icon">🔄</span>
+              Trade Analyzer
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+              <span class="nav-icon">⚙️</span>
+              Settings
+            </div>
+          </nav>
+        </aside>
+        
+        <main class="main-content">
+          <header class="header">
+            <div class="header-left"></div>
+            <div class="search-bar">
+              <span>🔍</span>
+              Search or command...
+              <kbd>⌘K</kbd>
+            </div>
+            <div class="header-right">
+              <div class="icon-btn">🔔</div>
+              <div class="icon-btn">👤</div>
+              <div class="icon-btn">◐</div>
+            </div>
+          </header>
+          
+          <div class="content-area">
+            <div style="margin-bottom: 24px;">
+              <h1 style="font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                👤 Player Explorer
+              </h1>
+              <p style="color: var(--text-secondary);">View and sort players by their season-long Z-scores.</p>
+            </div>
+            
+            <!-- Search and Filters -->
+            <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+              <div class="search-bar" style="flex: 1; width: auto;">
+                <span>🔍</span>
+                Search players...
+              </div>
+              <button class="btn btn-outline">Position ▼</button>
+              <button class="btn btn-outline">Team ▼</button>
+              <button class="btn btn-outline">Status ▼</button>
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <span style="color: var(--text-secondary); padding: 8px 0; font-size: 14px;">Toggle:</span>
+              <button class="btn btn-primary" style="padding: 8px 16px;">Z-Scores</button>
+              <button class="btn btn-outline" style="padding: 8px 16px;">Per-Game</button>
+              <button class="btn btn-outline" style="padding: 8px 16px;">Totals</button>
+              <button class="btn btn-outline" style="padding: 8px 16px;">Advanced</button>
+            </div>
+            
+            <!-- Table -->
+            <div class="card">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">Rank</th>
+                      <th>Player</th>
+                      <th style="width: 60px; text-align: center;">Pos</th>
+                      <th style="width: 60px; text-align: center;">GP</th>
+                      <th style="width: 80px; text-align: center;">Total ↓</th>
+                      <th style="width: 70px; text-align: center;">PTS</th>
+                      <th style="width: 70px; text-align: center;">REB</th>
+                      <th style="width: 70px; text-align: center;">AST</th>
+                      <th style="width: 70px; text-align: center;">STL</th>
+                      <th style="width: 70px; text-align: center;">BLK</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="background: rgba(249, 115, 22, 0.05);">
+                      <td style="color: var(--text-tertiary);">1</td>
+                      <td>
+                        <div class="table-player">
+                          <div class="player-avatar" style="width: 32px; height: 32px; font-size: 16px;">🏀</div>
+                          <div>
+                            <div style="font-weight: 500;">Nikola Jokić</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);">DEN</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="text-align: center;"><span class="badge">C</span></td>
+                      <td style="text-align: center; color: var(--text-secondary);">48</td>
+                      <td style="text-align: center; font-weight: 700; color: var(--success);">+18.2</td>
+                      <td style="text-align: center; color: var(--success);">+2.1</td>
+                      <td style="text-align: center; color: var(--success);">+3.4</td>
+                      <td style="text-align: center; color: var(--success);">+4.2</td>
+                      <td style="text-align: center; color: var(--success);">+1.8</td>
+                      <td style="text-align: center; color: var(--success);">+0.9</td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-tertiary);">2</td>
+                      <td>
+                        <div class="table-player">
+                          <div class="player-avatar" style="width: 32px; height: 32px; font-size: 16px;">🏀</div>
+                          <div>
+                            <div style="font-weight: 500;">Luka Dončić</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);">DAL</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="text-align: center;"><span class="badge">PG</span></td>
+                      <td style="text-align: center; color: var(--text-secondary);">45</td>
+                      <td style="text-align: center; font-weight: 700; color: var(--success);">+15.7</td>
+                      <td style="text-align: center; color: var(--success);">+3.8</td>
+                      <td style="text-align: center; color: var(--success);">+1.9</td>
+                      <td style="text-align: center; color: var(--success);">+3.1</td>
+                      <td style="text-align: center; color: var(--success);">+0.4</td>
+                      <td style="text-align: center; color: var(--success);">+0.2</td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-tertiary);">3</td>
+                      <td>
+                        <div class="table-player">
+                          <div class="player-avatar" style="width: 32px; height: 32px; font-size: 16px;">🏀</div>
+                          <div>
+                            <div style="font-weight: 500;">Shai Gilgeous-Alexander</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);">OKC</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="text-align: center;"><span class="badge">PG</span></td>
+                      <td style="text-align: center; color: var(--text-secondary);">50</td>
+                      <td style="text-align: center; font-weight: 700; color: var(--success);">+14.3</td>
+                      <td style="text-align: center; color: var(--success);">+3.2</td>
+                      <td style="text-align: center; color: var(--success);">+0.8</td>
+                      <td style="text-align: center; color: var(--success);">+1.2</td>
+                      <td style="text-align: center; color: var(--success);">+2.1</td>
+                      <td style="text-align: center; color: var(--success);">+0.4</td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-tertiary);">4</td>
+                      <td>
+                        <div class="table-player">
+                          <div class="player-avatar" style="width: 32px; height: 32px; font-size: 16px;">🏀</div>
+                          <div>
+                            <div style="font-weight: 500;">Giannis Antetokounmpo</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);">MIL</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="text-align: center;"><span class="badge">PF</span></td>
+                      <td style="text-align: center; color: var(--text-secondary);">47</td>
+                      <td style="text-align: center; font-weight: 700; color: var(--success);">+13.9</td>
+                      <td style="text-align: center; color: var(--success);">+2.9</td>
+                      <td style="text-align: center; color: var(--success);">+2.8</td>
+                      <td style="text-align: center; color: var(--success);">+1.1</td>
+                      <td style="text-align: center; color: var(--success);">+0.3</td>
+                      <td style="text-align: center; color: var(--success);">+2.1</td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-tertiary);">5</td>
+                      <td>
+                        <div class="table-player">
+                          <div class="player-avatar" style="width: 32px; height: 32px; font-size: 16px;">🏀</div>
+                          <div>
+                            <div style="font-weight: 500;">Anthony Davis</div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);">LAL</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style="text-align: center;"><span class="badge">C</span></td>
+                      <td style="text-align: center; color: var(--text-secondary);">44</td>
+                      <td style="text-align: center; font-weight: 700; color: var(--success);">+13.2</td>
+                      <td style="text-align: center; color: var(--success);">+2.4</td>
+                      <td style="text-align: center; color: var(--success);">+2.9</td>
+                      <td style="text-align: center; color: var(--success);">+0.6</td>
+                      <td style="text-align: center; color: var(--success);">+0.7</td>
+                      <td style="text-align: center; color: var(--success);">+2.4</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination">
+                <span>Showing 1-50 of 478 players</span>
+                <div class="pagination-buttons">
+                  <button class="pagination-btn">← Prev</button>
+                  <button class="pagination-btn active">1</button>
+                  <button class="pagination-btn">2</button>
+                  <button class="pagination-btn">3</button>
+                  <button class="pagination-btn">4</button>
+                  <button class="pagination-btn">5</button>
+                  <button class="pagination-btn">Next →</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="card" style="margin-top: 24px;">
+              <div class="card-header">
+                <div class="card-title">📊 Quick Stats: Nikola Jokić</div>
+                <div class="card-action">View Full Profile →</div>
+              </div>
+              <div class="card-content">
+                <div class="quick-stats">
+                  <div class="quick-stat">
+                    <div class="label">PTS</div>
+                    <div class="value z-positive">+2.1</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">REB</div>
+                    <div class="value z-positive">+3.4</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">AST</div>
+                    <div class="value z-positive">+4.2</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">STL</div>
+                    <div class="value z-positive">+1.8</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">BLK</div>
+                    <div class="value z-positive">+0.9</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">3PM</div>
+                    <div class="value z-positive">+0.4</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">FG%</div>
+                    <div class="value z-positive">+2.8</div>
+                  </div>
+                  <div class="quick-stat">
+                    <div class="label">FT%</div>
+                    <div class="value z-positive">+2.6</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    
+    <div class="screen-divider"></div>
+    
+    <!-- Screen 4: Command Palette -->
+    <div class="screen-frame">
+      <div class="screen-label">Screen 4: Command Palette (⌘K) — Overlay</div>
+      <div class="cmd-overlay" style="position: relative; height: 600px;">
+        <div class="cmd-dialog">
+          <div class="cmd-input-wrapper">
+            <span style="font-size: 18px;">🔍</span>
+            <input type="text" class="cmd-input" placeholder="Type a command or search..." value="">
+          </div>
+          <div class="cmd-list">
+            <div class="cmd-group-title">Quick Actions</div>
+            <div class="cmd-item selected">
+              <span>🔄</span>
+              Analyze Trade
+              <span class="shortcut">⌘T</span>
+            </div>
+            <div class="cmd-item">
+              <span>📊</span>
+              View Standings
+              <span class="shortcut">⌘S</span>
+            </div>
+            <div class="cmd-item">
+              <span>🔄</span>
+              Sync ESPN Rosters
+              <span class="shortcut">⌘R</span>
+            </div>
+            <div class="cmd-item">
+              <span>👤</span>
+              Search Players
+              <span class="shortcut">⌘P</span>
+            </div>
+            
+            <div class="cmd-group-title">✨ AI Suggestions</div>
+            <div class="cmd-item">
+              <span style="color: var(--brand);">💡</span>
+              "Drop Kyle Kuzma for Cason Wallace"
+            </div>
+            <div class="cmd-item">
+              <span style="color: var(--brand);">💡</span>
+              "Start Maxey tonight vs ORL"
+            </div>
+            <div class="cmd-item">
+              <span style="color: var(--brand);">💡</span>
+              "Trade deadline in 2 days"
+            </div>
+            
+            <div class="cmd-group-title">Recent</div>
+            <div class="cmd-item">
+              <span>📄</span>
+              Trade: Tatum ↔ Lillard
+            </div>
+            <div class="cmd-item">
+              <span>📄</span>
+              Player: Nikola Jokić
+            </div>
+          </div>
+          <div class="cmd-footer">
+            <div class="cmd-footer-left">
+              <span><kbd>↑↓</kbd> Navigate</span>
+              <span><kbd>↵</kbd> Select</span>
+            </div>
+            <span><kbd>esc</kbd> Close</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="screen-divider"></div>
+    
+    <!-- Screen 5: Mobile View -->
+    <div class="screen-frame">
+      <div class="screen-label">Screen 5: Mobile Responsive — 375×812 (iPhone)</div>
+      <div style="padding: 40px; display: flex; justify-content: center;">
+        <div class="mobile-frame">
+          <div class="mobile-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="logo" style="width: 28px; height: 28px; font-size: 14px;">🏀</div>
+              <span style="font-weight: 600;">Rotomind</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span>🔔</span>
+              <span>≡</span>
+            </div>
+          </div>
+          <div class="mobile-content">
+            <h2 style="font-size: 20px; margin-bottom: 4px;">📊 Command Center</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Fri, Jan 3, 2025</p>
+            
+            <div class="stat-card success" style="margin-bottom: 12px; padding: 16px;">
+              <div class="label">🏆 Standings Rank</div>
+              <div class="value" style="font-size: 24px;">3rd of 12</div>
+              <div class="change positive">▲ +2 from last week</div>
+            </div>
+            
+            <div class="stat-card" style="margin-bottom: 12px; padding: 16px;">
+              <div class="label">📈 Z-Score</div>
+              <div class="value" style="font-size: 24px;">+15.8</div>
+              <div class="change positive">▲ +2.3 this week</div>
+            </div>
+            
+            <div class="ai-insight-card" style="margin-bottom: 16px;">
+              <div class="title">💡 AI Insight</div>
+              <div class="text">"Start Maxey over Holiday tonight vs ORL."</div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 16px;">
+              <div class="card-header" style="padding: 12px 16px;">
+                <div class="card-title" style="font-size: 14px;">📅 Today's Lineup</div>
+              </div>
+              <div class="card-content" style="padding: 12px 16px;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                  <span style="color: var(--success);">✅</span>
+                  <span style="font-weight: 500;">Stephen Curry</span>
+                  <span style="margin-left: auto; color: var(--success); font-size: 13px;">+3.2</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                  <span style="color: var(--success);">✅</span>
+                  <span style="font-weight: 500;">LeBron James</span>
+                  <span style="margin-left: auto; color: var(--success); font-size: 13px;">+2.8</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
+                  <span style="color: var(--warning);">⚠️</span>
+                  <span style="font-weight: 500;">Kyrie Irving</span>
+                  <span style="margin-left: auto; color: var(--warning); font-size: 13px;">+1.1</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="category-list" style="margin-bottom: 16px;">
+              <div class="category-row">
+                <span class="category-label" style="color: var(--cat-pts); font-size: 11px;">PTS</span>
+                <div class="category-bar-bg" style="height: 8px;">
+                  <div class="category-bar-fill" style="width: 58%; background: var(--cat-pts);"></div>
+                </div>
+                <span class="category-rank" style="font-size: 11px;">7th</span>
+                <span class="category-trend" style="color: var(--success);">▲</span>
+              </div>
+              <div class="category-row">
+                <span class="category-label" style="color: var(--cat-reb); font-size: 11px;">REB</span>
+                <div class="category-bar-bg" style="height: 8px;">
+                  <div class="category-bar-fill" style="width: 75%; background: var(--cat-reb);"></div>
+                </div>
+                <span class="category-rank" style="font-size: 11px;">4th</span>
+                <span class="category-trend" style="color: var(--success);">▲</span>
+              </div>
+              <div class="category-row">
+                <span class="category-label" style="color: var(--cat-ast); font-size: 11px;">AST</span>
+                <div class="category-bar-bg" style="height: 8px;">
+                  <div class="category-bar-fill" style="width: 92%; background: var(--cat-ast);"></div>
+                </div>
+                <span class="category-rank" style="font-size: 11px;">2nd</span>
+                <span class="category-trend">→</span>
+              </div>
+              <div class="category-row">
+                <span class="category-label" style="color: var(--cat-stl); font-size: 11px;">STL</span>
+                <div class="category-bar-bg" style="height: 8px;">
+                  <div class="category-bar-fill" style="width: 33%; background: var(--cat-stl);"></div>
+                </div>
+                <span class="category-rank" style="font-size: 11px;">9th</span>
+                <span class="category-trend" style="color: var(--error);">▼</span>
+              </div>
+            </div>
+          </div>
+          <div class="mobile-bottom-nav">
+            <div class="mobile-nav-item active">
+              <div class="icon">📊</div>
+              Home
+            </div>
+            <div class="mobile-nav-item">
+              <div class="icon">🏆</div>
+              Leagues
+            </div>
+            <div class="mobile-nav-item">
+              <div class="icon">👥</div>
+              Teams
+            </div>
+            <div class="mobile-nav-item">
+              <div class="icon">🔄</div>
+              Trade
+            </div>
+            <div class="mobile-nav-item">
+              <div class="icon">⚙️</div>
+              Settings
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+      <p>🏀 Rotomind Figma Prototype</p>
+      <p style="font-size: 14px; margin-top: 8px;">Use this HTML as a reference when building in Figma</p>
+    </div>
+  </div>
+</body>
+</html>
