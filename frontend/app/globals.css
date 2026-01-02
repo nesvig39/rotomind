@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark theme (default) */
+    --background: 240 10% 4%;
+    --background-surface: 240 6% 7%;
+    --background-elevated: 240 5% 10%;
+    --background-hover: 240 4% 14%;
+
+    --foreground: 0 0% 98%;
+    --foreground-secondary: 240 5% 65%;
+    --foreground-tertiary: 240 4% 46%;
+
+    --brand: 25 95% 53%;
+    --brand-secondary: 21 90% 48%;
+    --brand-muted: 20 94% 14%;
+
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 217 91% 60%;
+
+    --border: 240 4% 16%;
+    --border-hover: 240 4% 26%;
+    --border-focus: 25 95% 53%;
+
+    --radius: 0.5rem;
+  }
+
+  [data-theme="light"] {
+    --background: 0 0% 100%;
+    --background-surface: 0 0% 98%;
+    --background-elevated: 0 0% 100%;
+    --background-hover: 240 5% 96%;
+
+    --foreground: 240 10% 4%;
+    --foreground-secondary: 240 4% 46%;
+    --foreground-tertiary: 240 5% 65%;
+
+    --border: 240 6% 90%;
+    --border-hover: 240 5% 84%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-hover;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-background-surface/80 backdrop-blur-md;
+  }
+
+  /* Gradient text for brand elements */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand to-warning bg-clip-text text-transparent;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-200 hover:bg-background-hover hover:border-border-hover hover:shadow-md;
+  }
+
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Z-score positive/negative coloring */
+  .z-positive {
+    @apply text-success;
+  }
+
+  .z-negative {
+    @apply text-error;
+  }
+
+  .z-neutral {
+    @apply text-foreground-secondary;
+  }
+}
+
+/* Command palette overlay */
+[cmdk-overlay] {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+}
+
+[cmdk-dialog] {
+  @apply fixed top-1/4 left-1/2 -translate-x-1/2 w-full max-w-xl;
+}

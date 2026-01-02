@@ -13,11 +13,23 @@ An AI-powered assistant for Fantasy NBA 8-Cat Rotisserie leagues. This applicati
 
 ## 🛠️ Tech Stack
 
-*   **Backend**: Python, FastAPI
-*   **Frontend**: Streamlit
+### Backend
+*   **Language**: Python, FastAPI
 *   **Database**: PostgreSQL
 *   **ORM**: SQLModel (SQLAlchemy + Pydantic)
 *   **Data Source**: `nba_api`
+
+### Frontend (Current - Streamlit)
+*   **Dashboard**: Streamlit (Data-centric UI)
+
+### Frontend (Next-Gen - Databricks One-Inspired)
+*   **Framework**: Next.js 14 (App Router)
+*   **UI Library**: shadcn/ui + Radix
+*   **Styling**: Tailwind CSS
+*   **State**: TanStack Query + Zustand
+*   **Charts**: Recharts
+
+See [FRONTEND_DESIGN.md](./FRONTEND_DESIGN.md) for the complete next-gen frontend design document and [MOCKUPS.md](./MOCKUPS.md) for visual mockups.
 
 ## 📦 Installation & Setup
 
